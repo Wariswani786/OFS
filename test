@@ -1,0 +1,511 @@
+
+<!-- Widget 1: Product Page Layout (Description left / Specifications + Shipping & Returns right) -->
+<!-- PromoPatriot California State Motorcycle Flag 6 x 9 inch (3-Ply Knitted Poly) - OnlineFlagStore Widget -->
+<style>
+  .pp-row {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 56px;
+    width: 100%;
+    margin: 0;
+    align-items: start;
+    font-family: Arial, sans-serif;
+    padding: 0 clamp(16px, 4vw, 40px);
+  }
+  .pp-row * { box-sizing: border-box; }
+
+  /* ---------- LEFT: Description ---------- */
+  .pdesc-badge {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%);
+    color: #fff;
+    font-size: clamp(10.5px, 1.6vw, 11.5px);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(10, 31, 63, 0.25);
+    font-family: Arial, sans-serif;
+  }
+
+  .pdesc-badge span {
+    color: #f59e0b;
+  }
+
+  .pdesc-heading {
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #0A1F3F;
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+    letter-spacing: 0.3px;
+    font-family: Arial, sans-serif;
+    word-wrap: break-word;
+  }
+
+  .pdesc-heading::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 4px;
+    background: #0A1F3F;
+    border-radius: 2px;
+    margin-top: 14px;
+  }
+
+  .pdesc-text {
+    font-size: clamp(13.5px, 1.8vw, 14.5px);
+    color: #374151;
+    line-height: 1.75;
+    margin: 20px 0 26px 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .pdesc-text strong {
+    color: #0A1F3F;
+  }
+
+  .pdesc-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 0 0 30px 0;
+  }
+
+  .pdesc-feature-card {
+    border: 1px solid #e5e7eb;
+    background: #fafbfc;
+    border-radius: 8px;
+    padding: 22px 10px;
+    text-align: center;
+    transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .pdesc-feature-card:hover {
+    border-color: #0A1F3F;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(10, 31, 63, 0.1);
+  }
+
+  .pdesc-feature-icon-wrap {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .pdesc-feature-icon {
+    width: 19px;
+    height: 19px;
+    stroke: #f59e0b;
+    fill: none;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .pdesc-feature-label {
+    font-size: clamp(10.5px, 1.6vw, 11.5px);
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: #0A1F3F;
+    font-family: Arial, sans-serif;
+  }
+
+  .pdesc-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .pdesc-check-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 15px 0;
+    border-bottom: 1px solid #f3f4f6;
+  }
+
+  .pdesc-check-item:last-child {
+    border-bottom: none;
+  }
+
+  .pdesc-check-mark {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #0A1F3F;
+    color: #fff;
+    font-size: 11px;
+    line-height: 20px;
+    text-align: center;
+    margin-top: 1px;
+  }
+
+  .pdesc-check-text {
+    font-size: clamp(13px, 1.8vw, 14px);
+    color: #374151;
+    line-height: 1.6;
+    font-family: Arial, sans-serif;
+  }
+
+  .pdesc-check-text strong {
+    color: #0A1F3F;
+    font-weight: 700;
+  }
+
+  /* ---------- RIGHT: Specifications / Shipping & Returns ---------- */
+  .pd-wrap {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(10, 31, 63, 0.05);
+  }
+
+  .pd-item {
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+  }
+  .pd-item:first-child {
+    border-top: none;
+  }
+
+  .pd-item.open {
+    background: #fafbfc;
+  }
+
+  .pd-trigger {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 20px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
+    gap: 12px;
+  }
+
+  .pd-trigger-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0A1F3F;
+    font-family: Arial, sans-serif;
+  }
+
+  .pd-chevron {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    stroke: #6b7280;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.3s ease;
+  }
+
+  .pd-item.open .pd-chevron {
+    transform: rotate(180deg);
+    stroke: #0A1F3F;
+  }
+
+  .pd-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+  }
+
+  .pd-item.open .pd-body {
+    max-height: 1400px;
+  }
+
+  .pd-content {
+    padding: 0 22px 24px;
+  }
+
+  .pd-spec-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+    font-family: Arial, sans-serif;
+  }
+
+  .pd-spec-table tr {
+    border-bottom: 1px solid #eef0f2;
+  }
+
+  .pd-spec-table tr:last-child {
+    border-bottom: none;
+  }
+
+  .pd-spec-table td {
+    padding: 11px 8px;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .pd-spec-table td:first-child {
+    font-weight: 700;
+    color: #0A1F3F;
+    width: 42%;
+    white-space: nowrap;
+  }
+
+  .pd-spec-table td:last-child {
+    color: #374151;
+  }
+
+  .pd-shipping-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .pd-shipping-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .pd-shipping-icon {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pd-shipping-icon svg {
+    width: 18px;
+    height: 18px;
+    stroke: #f59e0b;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .pd-shipping-label {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0A1F3F;
+    margin: 0 0 3px 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .pd-shipping-text {
+    font-size: 13px;
+    color: #4b5563;
+    margin: 0;
+    line-height: 1.6;
+    font-family: Arial, sans-serif;
+  }
+
+  /* ================= RESPONSIVE ================= */
+
+  @media (max-width: 860px) {
+    .pp-row {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .pp-row {
+      gap: 28px;
+    }
+    .pdesc-feature-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .pd-trigger {
+      padding: 16px 16px;
+    }
+    .pd-content {
+      padding: 0 16px 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .pdesc-badge {
+      font-size: 10px;
+      padding: 6px 12px;
+    }
+    .pdesc-feature-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .pdesc-feature-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      padding: 14px 16px;
+    }
+    .pdesc-feature-icon-wrap {
+      margin: 0;
+    }
+    .pdesc-check-item {
+      padding: 13px 0;
+    }
+    .pd-spec-table tr {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 0;
+    }
+    .pd-spec-table td {
+      padding: 2px 0;
+      white-space: normal;
+    }
+    .pd-spec-table td:first-child {
+      width: 100%;
+      color: #0A1F3F;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+  }
+</style>
+
+<div class="pp-row">
+
+  <!-- LEFT COLUMN: Description -->
+  <div class="pp-col-left">
+    <div class="pdesc-badge">&#9733; <span>RIDER TESTED</span> &nbsp;·&nbsp; About This Product</div>
+
+    <h2 class="pdesc-heading">High-Speed California Motorcycle Flag 6x9 In</h2>
+
+    <p class="pdesc-text">Ride with pride using the <strong>PromoPatriot 6x9 Inch California State Motorcycle Flag</strong>. Built with heavy-duty 3-ply knitted polyester and an inner shade liner, this flag reads correctly on both sides and mounts securely onto 3/8" poles for high-speed highway riding.</p>
+
+    <div class="pdesc-feature-grid">
+      <div class="pdesc-feature-card">
+        <div class="pdesc-feature-icon-wrap">
+          <svg class="pdesc-feature-icon" viewBox="0 0 24 24"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6h1a3 3 0 0 1 3 3v3.5M9 17.5h6M5.5 14l3-7.5h5.5l2 4"/></svg>
+        </div>
+        <div class="pdesc-feature-label">Luggage Racks</div>
+      </div>
+      <div class="pdesc-feature-card">
+        <div class="pdesc-feature-icon-wrap">
+          <svg class="pdesc-feature-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="pdesc-feature-label">Fits 3/8" Mounts</div>
+      </div>
+      <div class="pdesc-feature-card">
+        <div class="pdesc-feature-icon-wrap">
+          <svg class="pdesc-feature-icon" viewBox="0 0 24 24"><polygon points="12 2 15 9 22 9.5 17 14.5 18.5 22 12 18 5.5 22 7 14.5 2 9.5 9 9"/></svg>
+        </div>
+        <div class="pdesc-feature-label">3-Ply Readable</div>
+      </div>
+    </div>
+
+    <ul class="pdesc-checklist">
+      <li class="pdesc-check-item">
+        <span class="pdesc-check-mark">&#10003;</span>
+        <span class="pdesc-check-text"><strong>Compact 6x9 In Profile</strong> — Compact motorcycle and ATV dimension, sized perfectly to prevent drag while maintaining sharp visibility on luggage racks and sissy bars</span>
+      </li>
+      <li class="pdesc-check-item">
+        <span class="pdesc-check-mark">&#10003;</span>
+        <span class="pdesc-check-text"><strong>Heavy 3-Ply Knitted Polyester</strong> — Features two outer printed layers with an inner blockout liner, making the flag 100% double-sided and correct-reading on both sides</span>
+      </li>
+      <li class="pdesc-check-item">
+        <span class="pdesc-check-mark">&#10003;</span>
+        <span class="pdesc-check-text"><strong>0.75-Inch Reinforced Pole Sleeve</strong> — Closed-top sleeve designed to fit standard 3/8 inch motorcycle flag poles with heavy lock-stitched edges built for highway turbulence</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- RIGHT COLUMN: Specifications / Shipping & Returns -->
+  <div class="pp-col-right">
+    <div class="pd-wrap">
+
+      <!-- Specifications -->
+      <div class="pd-item open">
+        <button class="pd-trigger" aria-expanded="true">
+          <span class="pd-trigger-label">Specifications</span>
+          <svg class="pd-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        <div class="pd-body">
+          <div class="pd-content">
+            <table class="pd-spec-table">
+              <tr><td>Product Name</td><td>PromoPatriot California State Motorcycle Flag</td></tr>
+              <tr><td>SKU / Part No.</td><td>B2611</td></tr>
+              <tr><td>Design</td><td>Bear Flag Republic (California Grizzly & Red Star)</td></tr>
+              <tr><td>Flag Size</td><td>6 x 9 in</td></tr>
+              <tr><td>Fabric Construction</td><td>3-Ply Knitted Polyester (Double-Sided Correct Reading)</td></tr>
+              <tr><td>Sleeve Diameter</td><td>0.75 in Pole Sleeve (Fits 3/8 in Pole Mounts)</td></tr>
+              <tr><td>Stitching</td><td>Double Lock-Stitched High-Speed Edges</td></tr>
+              <tr><td>Blockout Liner</td><td>Yes — Inner Shade Layer Eliminates Translucency</td></tr>
+              <tr><td>UV Resistance</td><td>Yes — High-Saturation Dye Protection</td></tr>
+              <tr><td>Recommended Use</td><td>Motorcycle Luggage Racks, Sissy Bars, ATVs</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping & Returns -->
+      <div class="pd-item">
+        <button class="pd-trigger" aria-expanded="false">
+          <span class="pd-trigger-label">Shipping &amp; Returns</span>
+          <svg class="pd-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        <div class="pd-body">
+          <div class="pd-content">
+            <ul class="pd-shipping-list">
+              <li class="pd-shipping-item">
+                <div class="pd-shipping-icon">
+                  <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                </div>
+                <div>
+                  <p class="pd-shipping-label">Free Standard Shipping</p>
+                  <p class="pd-shipping-text">Free on all orders over $75. Standard delivery takes 3–5 business days. Expedited options available at checkout. Orders placed before 2 PM EST ship same day.</p>
+                </div>
+              </li>
+              <li class="pd-shipping-item">
+                <div class="pd-shipping-icon">
+                  <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+                </div>
+                <div>
+                  <p class="pd-shipping-label">30-Day Hassle-Free Returns</p>
+                  <p class="pd-shipping-text">Not 100% satisfied? Return your flag within 30 days for a full refund. Items must be in original, unused condition.</p>
+                </div>
+              </li>
+              <li class="pd-shipping-item">
+                <div class="pd-shipping-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div>
+                  <p class="pd-shipping-label">6-Month Quality Warranty</p>
+                  <p class="pd-shipping-text">Every PromoPatriot flag is backed by a 6-month warranty against manufacturing defects.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+

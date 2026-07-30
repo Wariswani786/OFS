@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PromoPatriot WooCommerce Uploader</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0A1F3F;--mid:#1a3a6e;--gold:#f59e0b;--green:#065f46;--bg:#f4f6fb;--bd:#e5e7eb;--tx:#374151;--dk:#111827;--mu:#6b7280;--wh:#fff;--re:#dc2626;--r:10px}
+body{font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.hdr{background:var(--navy);padding:13px 22px;display:flex;align-items:center;gap:11px;box-shadow:0 2px 10px rgba(10,31,63,.4)}
+.logo{width:32px;height:32px;background:var(--gold);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;color:var(--navy)}
+.hdr h1{color:#fff;font-size:15px;font-weight:700}
+.hdr p{color:rgba(255,255,255,.45);font-size:11px;margin-top:1px}
+.app{display:grid;grid-template-columns:360px 1fr;min-height:calc(100vh - 52px)}
+.left{background:var(--wh);border-right:1px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.ltop{padding:15px;border-bottom:1px solid var(--bd);overflow-y:auto}
+.sec{font-size:10px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--mu);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--bd)}
+.dz{border:2px dashed #c7d7fe;border-radius:var(--r);background:#f5f7ff;padding:15px;text-align:center;cursor:pointer;position:relative;margin-bottom:12px;transition:.2s}
+.dz:hover,.dz.ov{border-color:var(--mid);background:#eef1ff}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dz .ic{font-size:21px;margin-bottom:4px}
+.dz .lb{font-size:12px;font-weight:600;color:var(--mid)}
+.dz .sb{font-size:10px;color:var(--mu);margin-top:2px}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:11px;font-weight:600;color:var(--navy);margin-bottom:3px}
+select,input[type=text]{width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:7px;font-size:12.5px;font-family:inherit;color:var(--dk);background:var(--wh);outline:none}
+select:focus,input:focus{border-color:var(--navy)}
+.ibox{background:#f0f4ff;border:1px solid #c7d7fe;border-radius:8px;padding:9px 11px;margin-bottom:10px;font-size:11px;color:#3730a3;line-height:1.6;display:none}
+.ibox strong{display:block;font-size:12px;margin-bottom:1px}
+.pbox{background:#fff8e1;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.pbox .pl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#92400e;margin-bottom:5px}
+.prow{display:flex;gap:6px;align-items:center}
+.prow input{flex:1;padding:6px 8px;font-size:11.5px;border:1px solid #fde68a;border-radius:6px;outline:none}
+.prow input:focus{border-color:var(--gold)}
+.pbtn{padding:6px 12px;background:var(--gold);color:var(--navy);border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.pbtn:hover{opacity:.85}
+.pbtn:disabled{opacity:.4;cursor:not-allowed}
+.pres{margin-top:6px;font-size:11px;color:#92400e;line-height:1.5;display:none}
+.pres.ok{color:var(--green)}
+.pres.er{color:var(--re)}
+.dmenus{flex:1;overflow-y:auto;border-top:1px solid var(--bd)}
+.ms{border-bottom:1px solid var(--bd)}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:10px 15px;cursor:pointer;user-select:none;background:var(--wh);transition:.15s}
+.mh:hover{background:#f9fafb}
+.mhl{display:flex;align-items:center;gap:8px}
+.mi{font-size:13px}.mt{font-size:12px;font-weight:700;color:var(--dk)}
+.mc{font-size:10px;font-weight:700;background:#e0e7ff;color:#3730a3;padding:1px 7px;border-radius:10px}
+.mb{display:none;background:#fafbfc;border-top:1px solid var(--bd)}
+.mb.op{display:block}
+.mf{padding:8px 15px;border-bottom:1px solid #f0f0f0}
+.mf:last-child{border-bottom:none}
+.mf label{display:block;font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mu);margin-bottom:3px}
+.mf textarea,.mf input[type=text]{width:100%;padding:5px 8px;border:1px solid var(--bd);border-radius:6px;font-size:11.5px;font-family:inherit;color:var(--dk);background:var(--wh);resize:vertical;outline:none}
+.mf textarea:focus,.mf input[type=text]:focus{border-color:var(--navy)}
+.mf textarea{min-height:34px}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
+.lact{padding:11px 15px;border-top:1px solid var(--bd);background:var(--wh)}
+.bbuild{width:100%;padding:10px;background:linear-gradient(135deg,var(--navy),var(--mid));color:#fff;border:none;border-radius:var(--r);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:7px}
+.bbuild:hover:not(:disabled){opacity:.9}
+.bbuild:disabled{opacity:.35;cursor:not-allowed}
+.bpush{width:100%;padding:10px;background:linear-gradient(135deg,#065f46,#047857);color:#fff;border:none;border-radius:var(--r);font-size:12.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.bpush:hover:not(:disabled){opacity:.9}
+.bpush:disabled{opacity:.35;cursor:not-allowed}
+.plog{margin-top:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:9px 11px;font-size:11px;line-height:1.7;display:none}
+.ok{color:#065f46;font-weight:700}.err{color:var(--re);font-weight:700}
+.right{padding:18px;overflow-y:auto}
+.tbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.tbar .sec{margin-bottom:0;border:none}
+.bdg{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase}
+.bdg-idle{background:#f3f4f6;color:var(--mu)}
+.bdg-ready{background:#d1fae5;color:#065f46}
+.tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:13px}
+.tab{padding:7px 15px;font-size:12px;font-weight:600;color:var(--mu);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+.pane{display:none}.pane.active{display:block}
+.cbox{background:#f8fafc;border:1px solid var(--bd);border-radius:var(--r);padding:12px;font-family:"Courier New",monospace;font-size:11px;line-height:1.6;color:#1e293b;white-space:pre-wrap;word-break:break-word;max-height:calc(100vh - 165px);overflow-y:auto}
+.bcopy{padding:5px 11px;font-size:11px;font-weight:600;background:var(--navy);color:#fff;border:none;border-radius:6px;cursor:pointer}
+.bcopy:hover{opacity:.85}.bcopy.dn{background:var(--green)}
+.empty{text-align:center;padding:60px 20px;color:var(--mu)}
+.empty svg{stroke:#d1d5db;margin-bottom:10px}
+.empty p{font-size:13px}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="logo">PP</div>
+  <div>
+    <h1>PromoPatriot &middot; WooCommerce Uploader</h1>
+    <p>Excel &rarr; Priority Lookup &rarr; Review &rarr; Build HTML &rarr; Push to WooCommerce</p>
+  </div>
+</div>
+<div class="app">
+<div class="left">
+  <div class="ltop">
+
+    <div class="sec">Priority ERP &middot; SKU Lookup</div>
+    <div class="pbox">
+      <div class="pl">Look up SKU in Priority ERP</div>
+      <div class="prow">
+        <input type="text" id="psku" placeholder="Enter SKU e.g. B0501" onkeydown="if(event.key==='Enter')lookupP()">
+        <button class="pbtn" onclick="lookupP()">Lookup</button>
+      </div>
+      <div class="pres" id="pres"></div>
+    </div>
+
+    <div class="sec">Step 1 &middot; Upload Excel</div>
+    <div class="dz" id="dz" ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+      <input type="file" accept=".xlsx,.xls" onchange="onFile(event)">
+      <div class="ic">&#x1F4CA;</div>
+      <div class="lb" id="dlb">Drop tracker Excel or click to browse</div>
+      <div class="sb" id="dsb">Reads Title, SKU, B1&ndash;B5, FAQs, Care, Comparison, Description</div>
+    </div>
+
+    <div class="sec">Step 2 &middot; Select Product</div>
+    <div class="fld">
+      <select id="psel" onchange="onSelect()">
+        <option value="">&mdash; load Excel first &mdash;</option>
+      </select>
+    </div>
+    <div class="ibox" id="ibox">
+      <strong id="ititle"></strong>
+      <span id="imeta"></span>
+    </div>
+
+    <div class="sec">Step 3 &middot; WooCommerce Product ID</div>
+    <div class="fld">
+      <label>Product ID <span style="color:var(--re)">*</span></label>
+      <input type="text" id="wid" placeholder="e.g. 1042 — hover product in WP admin">
+    </div>
+  </div>
+
+  <div class="dmenus" id="dmenus"></div>
+
+  <div class="lact">
+    <button class="bbuild" id="bbuild" onclick="buildHTML()" disabled>
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      Build HTML from Data
+    </button>
+    <button class="bpush" id="bpush" onclick="pushToWoo()" disabled>
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+      Push to WooCommerce
+    </button>
+    <div class="plog" id="plog"></div>
+  </div>
+</div>
+
+<div class="right">
+  <div class="tbar">
+    <div class="sec">Generated Output</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="bcopy" id="bcopy" onclick="copyHTML()" style="display:none">Copy HTML</button>
+      <span class="bdg bdg-idle" id="stat">Idle</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="swTab(event,'code')">HTML Code</button>
+    <button class="tab" onclick="swTab(event,'preview')">Preview</button>
+  </div>
+  <div class="pane active" id="pane-code">
+    <div class="empty" id="empty">
+      <svg width="44" height="44" fill="none" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <p>Select a product, review the data menus,<br>then click <strong>Build HTML from Data</strong></p>
+    </div>
+    <div class="cbox" id="cout" style="display:none"></div>
+  </div>
+  <div class="pane" id="pane-preview">
+    <iframe id="prev" style="width:100%;border:1px solid var(--bd);border-radius:var(--r);min-height:calc(100vh - 165px)" sandbox="allow-scripts"></iframe>
+  </div>
+</div>
+</div>
+
+<script>
+let prods=[],bHTML="",bShort="";
+
+// ── Priority Lookup ────────────────────────────────────────────────────
+async function lookupP(){
+  const sku=document.getElementById('psku').value.trim();
+  if(!sku){alert('Enter a SKU');return;}
+  const btn=document.querySelector('.pbtn'),res=document.getElementById('pres');
+  btn.disabled=true;res.style.display='block';res.className='pres';res.textContent='Looking up '+sku+'...';
+  try{
+    const r=await fetch('/priority-lookup?sku='+encodeURIComponent(sku));
+    const d=await r.json();
+    if(d.error){res.className='pres er';res.textContent='Error: '+d.error;}
+    else if(d.value&&d.value.length>0){
+      const it=d.value[0];
+      res.className='pres ok';
+      res.innerHTML='<strong>'+it.PARTNAME+'</strong><br>'+it.PARTDES+'<br>Status: '+(it.STATDES||'N/A');
+      const sf=document.getElementById('d-sku');if(sf)sf.value=it.PARTNAME;
+    }else{res.className='pres er';res.textContent='SKU not found in Priority';}
+  }catch(e){res.className='pres er';res.textContent='Failed: '+e.message;}
+  btn.disabled=false;
+}
+
+// ── Excel ──────────────────────────────────────────────────────────────
+function onDrag(e,ov){e.preventDefault();document.getElementById('dz').classList.toggle('ov',ov)}
+function onDrop(e){e.preventDefault();onDrag(e,false);if(e.dataTransfer.files[0])loadXL(e.dataTransfer.files[0])}
+function onFile(e){if(e.target.files[0])loadXL(e.target.files[0])}
+function loadXL(file){
+  const r=new FileReader();
+  r.onload=e=>{
+    const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+    prods=rows.filter(r=>r['Title']||r['Part no/SKU']);
+    const sel=document.getElementById('psel');
+    sel.innerHTML='<option value="">-- choose a product --</option>';
+    prods.forEach((p,i)=>{
+      const o=document.createElement('option');o.value=i;
+      const sk=p['Part no/SKU']||'';
+      o.textContent=(sk?'['+sk+'] ':'')+(p['Title']||'').substring(0,60);
+      sel.appendChild(o);
+    });
+    document.getElementById('dlb').textContent='\u2713 '+file.name;
+    document.getElementById('dsb').textContent=prods.length+' products loaded';
+  };
+  r.readAsArrayBuffer(file);
+}
+
+function onSelect(){
+  const idx=document.getElementById('psel').value;
+  if(idx===''){document.getElementById('ibox').style.display='none';document.getElementById('bbuild').disabled=true;document.getElementById('dmenus').innerHTML='';return;}
+  const p=prods[parseInt(idx)];
+  document.getElementById('ititle').textContent=p['Title']||'';
+  document.getElementById('imeta').textContent='SKU: '+(p['Part no/SKU']||'N/A')+(p['Price']?' | $'+p['Price']:'');
+  document.getElementById('ibox').style.display='block';
+  document.getElementById('bbuild').disabled=false;
+  if(p['Part no/SKU'])document.getElementById('psku').value=p['Part no/SKU'];
+  renderMenus(p);
+}
+
+function xe(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+// ── Parse B columns ────────────────────────────────────────────────────
+// Format: "CardLabel:\n ChecklistLabel- Description"
+function parseB(v){
+  v=(v||'').trim();if(!v)return null;
+  const nl=v.indexOf('\n'),col=v.indexOf(':');
+  let cardLabel=v,chkLabel=v,desc='';
+  if(col>-1&&nl>col){
+    cardLabel=v.substring(0,col).trim();
+    const rest=v.substring(nl+1).trim();
+    const dash=rest.indexOf('-');
+    if(dash>-1){chkLabel=rest.substring(0,dash).trim();desc=rest.substring(dash+1).trim();}
+    else{chkLabel=rest;desc='';}
+  }else if(nl>-1){
+    cardLabel=v.substring(0,nl).trim();chkLabel=cardLabel;desc=v.substring(nl+1).trim();
+  }else if(col>-1){
+    cardLabel=v.substring(0,col).trim();chkLabel=cardLabel;desc=v.substring(col+1).trim();
+  }
+  return{cardLabel,chkLabel,desc};
+}
+
+function parseFeatures(p){
+  const out=[];
+  ['B 1','B2','B3','B4','B5'].forEach(k=>{const b=parseB(p[k]);if(b)out.push(b);});
+  return out;
+}
+
+function parseCompare(raw){
+  const rows=[];
+  (raw||'').split('\n').forEach(line=>{
+    line=line.trim();
+    if(!line||!line.includes('|'))return;
+    if(line.toLowerCase().includes('trust badge'))return;
+    if(line.toLowerCase().startsWith('the difference'))return;
+    // Skip header row e.g. 'Feature: Our Flag | Typical Flag'
+    if(line.toLowerCase().startsWith('feature:'))return;
+    if(line.toLowerCase().replace(/\s/g,'').startsWith('feature|'))return;
+    const pts=line.split('|').map(s=>s.trim());
+    const lft=pts[0].split(':');
+    const feat=lft[0].trim(),ours=(lft[1]||'').trim(),theirs=pts[1]||'';
+    if(feat)rows.push({feat,ours,theirs});
+  });
+  return rows;
+}
+
+function parseCare(raw){
+  const items=[];
+  const lines=(raw||'').split('\n').map(l=>l.trim()).filter(Boolean);
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i],col=line.indexOf(':');
+    if(col>-1&&col<30){
+      const label=line.substring(0,col).trim();
+      let text=line.substring(col+1).trim();
+      if(!text&&lines[i+1]){text=lines[i+1];i++;}
+      if(label)items.push({label,text});
+    }
+  }
+  return items;
+}
+
+function parseFAQs(raw){
+  // Format: "Question\n  Answer\n\nQuestion\n  Answer"
+  const items=[];
+  const blocks=(raw||'').split(/\n\s*\n/).map(b=>b.trim()).filter(Boolean);
+  blocks.forEach(block=>{
+    const lines=block.split('\n');
+    const q=lines[0].trim();
+    const a=lines.slice(1).map(l=>l.trim()).filter(Boolean).join(' ');
+    if(q)items.push({q,a});
+  });
+  return items;
+}
+
+// ── Spec rows: editable in menu, auto-detected as fallback
+function buildSpecs(title,sku){
+  const rows=[],tl=title.toLowerCase();
+  const shortTitle=title.replace(/^PromoPatriot\s+/i,'');
+  rows.push(['Product Name','PromoPatriot '+shortTitle]);
+  if(sku)rows.push(['SKU / Part No.',sku]);
+  if(tl.includes('california'))rows.push(['Design','Bear Flag Republic (California Grizzly & Red Star)']);
+  const sm=title.match(/(\d+\s*[x\xD7]\s*\d+\s*(ft|in|inch|cm)?)/i);
+  if(sm)rows.push(['Flag Size',sm[0]]);
+  if(tl.includes('11 inch')||tl.includes('11-inch'))rows.push(['Staff Length','11 in Solid Black Plastic Pole']);
+  if(tl.includes('gold ball'))rows.push(['Finial Top','Decorative Gold Ball Top']);
+  if(tl.includes('base included')||tl.includes('with base')||tl.includes('matching base'))rows.push(['Base Included','Yes \u2014 Black Plastic Stand Base']);
+  // Material
+  if(tl.includes('200d nylon'))rows.push(['Material','200D Heavyweight Nylon']);
+  else if(tl.includes('knitted polyester'))rows.push(['Material','Knitted Polyester']);
+  else if(tl.includes('polyester'))rows.push(['Material','Durable Printed Polyester']);
+  // Print type
+  if(tl.includes('reverse print')||tl.includes('reverse bleed'))rows.push(['Print Type','Single Sided Reverse Bleed']);
+  else if(tl.includes('printed polyester')||tl.includes('single sided'))rows.push(['Print Type','Single Sided Bleed Print']);
+  // Stitching
+  if(tl.includes('lock-stitch')||tl.includes('lock stitch')||tl.includes('reinforced stitch'))rows.push(['Stitching','Double Lock-Stitched Perimeter Edges']);
+  else if(tl.includes('stitched'))rows.push(['Stitching','Reinforced Stitched Edges']);
+  // Header
+  if(tl.includes('canvas header')||tl.includes('200d'))rows.push(['Header','Heavy-Duty White Canvas Header']);
+  else if(tl.includes('sleeve'))rows.push(['Header','0.75" Pole Sleeve']);
+  // Hardware/Grommets
+  if(tl.includes('brass grommet'))rows.push(['Grommets','2 Solid Brass Grommets']);
+  else if(tl.includes('iron grommet'))rows.push(['Grommets','2 Iron Plated Grommets']);
+  // UV
+  if(tl.includes('fade')||tl.includes('200d')||tl.includes('nylon'))rows.push(['UV Resistance','Yes \u2014 Fade-Resistant Dyes']);
+  else if(tl.includes('polyester'))rows.push(['UV Resistance','Yes \u2014 Bright UV-Resistant Dyes']);
+  // Edge finishing
+  if(tl.includes('heat-seal')||tl.includes('heat seal'))rows.push(['Edge Finishing','Precision Heat-Sealed Fray-Free Edges']);
+  // Recommended Use
+  if(tl.includes('desk')||tl.includes('stick flag'))rows.push(['Recommended Use','Office Desks, Classroom Displays, Corporate Gifts']);
+  else if(tl.includes('indoor outdoor'))rows.push(['Recommended Use','Indoor Displays, Events, Outdoor Display']);
+  else if(tl.includes('polyester'))rows.push(['Recommended Use','Indoor Displays, Events, Mild Outdoor Wind']);
+  return rows;
+}
+
+// ── Render Menus ──────────────────────────────────────────────────────
+function renderMenus(p){
+  const ft=parseFeatures(p),cr=parseCompare(p['Comparison Table']||''),ca=parseCare(p['Care and Maintenance']||''),fq=parseFAQs(p['FAQs']||'');
+  window._fc=ft.length;window._cc=cr.length;window._kc=ca.length;window._qc=fq.length;
+  const con=document.getElementById('dmenus');con.innerHTML='';
+
+  // Determine accent/heading defaults from title
+  const tl=(p['Title']||'').toLowerCase();
+  const isDesk=tl.includes('desk')||tl.includes('stick flag')||tl.includes('4 x 6')||tl.includes('4x6');
+  const defaultAccent=isDesk?'Tabletop &amp; Workspace Decor':'About This Product';
+  const defaultW2H=isDesk?'Mini Desk Flag Features':'Key Product Features';
+  const defaultW2S=isDesk?'Complete set with pole and base \u2014 instant display for offices and classrooms':'Everything you need in one complete set';
+
+  const secs=[
+    {id:'basic',icon:'&#x1F4CB;',title:'Basic Info',
+     body:'<div class="mf"><label>Title</label><input type="text" id="d-title" value="'+xe(p['Title']||'')+'"></div>'+
+          '<div class="mf"><label>Description</label><textarea id="d-desc" rows="4">'+xe(p['Description and others']||'')+'</textarea></div>'+
+          '<div class="mf"><label>Badge text (pill — auto from title if blank)</label><input type="text" id="d-badge" placeholder="e.g. DESK READY SET"></div>'+
+          '<div class="mf"><label>W2 Accent line</label><input type="text" id="d-accent" value="'+xe(defaultAccent)+'"></div>'+
+          '<div class="mf"><label>W2 Heading</label><input type="text" id="d-w2h" value="'+xe(defaultW2H)+'"></div>'+
+          '<div class="mf"><label>W2 Subtext</label><input type="text" id="d-w2s" value="'+xe(defaultW2S)+'"></div>'+
+          '<div class="mf"><label>Short Heading (e.g. Printed Polyester California State Flag)</label><input type="text" id="d-sheading" value=""></div>'+
+          '<div class="mf"><label>SKU</label><input type="text" id="d-sku" value="'+xe(p['Part no/SKU']||'')+'" style="margin-bottom:3px"></div>'+
+          '<div class="mf"><label>Price ($)</label><input type="text" id="d-price" value="'+xe(p['Price']||'')+'" style="margin-bottom:3px"></div>'+
+          '<div class="mf"><label>Weight (lbs — for shipping)</label><input type="text" id="d-weight" value=""></div>'+
+          '<div class="mf"><label>SEO Title</label><input type="text" id="d-seo-title" value="'+xe((function(){var s=p['SEO Title and Description']||'';var m=s.match(/SEO Title:\s*(.+?)(?:\n|$)/i);return m?m[1].trim():'';})())+'"></div>'+
+          '<div class="mf"><label>Meta Description</label><textarea id="d-seo-meta" rows="2" placeholder="Pull from SEO Title and Description column">'+xe((p['SEO Title and Description']||'').replace(/.*Meta Description:\s*/is,'').trim())+'</textarea></div>'+
+          '<div class="mf"><label>Focus Keyword</label><input type="text" id="d-seo-kw" value="'+xe(p['Focus Keyword']||'')+'"></div>'+
+          '<div class="mf"><label>URL</label><input type="text" id="d-url" value="'+xe(p['URL']||'')+'"></div>'+
+          '<div class="mf"><label>Tags (short description)</label><textarea id="d-tags" rows="2">'+xe(p['Tags']||'')+'</textarea></div>'
+    },
+    {id:'features',icon:'&#x2B50;',title:'Feature Cards (B1-B5)',count:ft.length,
+     body:ft.map((f,i)=>'<div class="mf"><label>B'+(i+1)+' &mdash; Card Label / Checklist Label / Desc</label>'+
+       '<input type="text" id="d-fcl-'+i+'" value="'+xe(f.cardLabel)+'" placeholder="Card label" style="margin-bottom:3px">'+
+       '<input type="text" id="d-fll-'+i+'" value="'+xe(f.chkLabel)+'" placeholder="Checklist bold label" style="margin-bottom:3px">'+
+       '<textarea id="d-fd-'+i+'" rows="2">'+xe(f.desc)+'</textarea></div>').join('')
+    },
+    {id:'compare',icon:'&#x2696;&#xFE0F;',title:'Comparison Table',count:cr.length,
+     body:'<div class="mf"><div class="r3" style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--mu)"><span>Feature</span><span>Ours</span><span>Typical</span></div></div>'+
+          cr.map((r,i)=>'<div class="mf"><div class="r3">'+
+            '<input type="text" id="d-cf-'+i+'" value="'+xe(r.feat)+'">'+
+            '<input type="text" id="d-co-'+i+'" value="'+xe(r.ours)+'">'+
+            '<input type="text" id="d-ct-'+i+'" value="'+xe(r.theirs)+'">'+
+          '</div></div>').join('')
+    },
+    {id:'care',icon:'&#x1F9F9;',title:'Care & Maintenance',count:ca.length,
+     body:ca.map((c,i)=>'<div class="mf"><label>Tip '+(i+1)+'</label>'+
+       '<input type="text" id="d-cl-'+i+'" value="'+xe(c.label)+'" style="margin-bottom:3px">'+
+       '<textarea id="d-ct2-'+i+'" rows="2">'+xe(c.text)+'</textarea></div>').join('')
+    },
+    {id:'faqs',icon:'&#x2753;',title:'FAQs',count:fq.length,
+     body:fq.map((f,i)=>'<div class="mf"><label>Q'+(i+1)+'</label>'+
+       '<input type="text" id="d-fq-'+i+'" value="'+xe(f.q||f)+'" style="margin-bottom:3px">'+
+       '<label>Answer</label><textarea id="d-fa-'+i+'" rows="3">'+xe(f.a||'')+'</textarea></div>').join('')
+    }
+  ];
+
+  secs.forEach(s=>{
+    const d=document.createElement('div');d.className='ms';
+    d.innerHTML='<div class="mh" onclick="togMenu(\''+s.id+'\')"><div class="mhl"><span class="mi">'+s.icon+'</span><span class="mt">'+s.title+'</span>'+(s.count!==undefined?'<span class="mc">'+s.count+'</span>':'')+'</div><span id="ch-'+s.id+'">&#x25BC;</span></div><div class="mb" id="mb-'+s.id+'">'+s.body+'</div>';
+    con.appendChild(d);
+  });
+}
+
+function togMenu(id){const b=document.getElementById('mb-'+id),c=document.getElementById('ch-'+id);const op=b.classList.toggle('op');c.innerHTML=op?'&#x25B2;':'&#x25BC;'}
+function g(id){const el=document.getElementById(id);return el?el.value.trim():''}
+
+// ── Build HTML ─────────────────────────────────────────────────────────
+function buildHTML(){
+  const title=g('d-title'),desc=g('d-desc'),sku=g('d-sku'),tags=g('d-tags');
+  const accent=g('d-accent')||'Tabletop &amp; Workspace Decor';
+  const w2h=g('d-w2h')||'Mini Desk Flag Features';
+  const w2s=g('d-w2s')||'Complete set with pole and base';
+
+  // Badge: manual override OR auto from title (strip PromoPatriot, take before first " - ")
+  const rawBadge=g('d-badge');
+  // Pull Trust Badge from Comparison Table
+  let trustBadge='';
+  const _pi=document.getElementById('psel').value;
+  if(_pi!==''){const _pp=prods[parseInt(_pi)];const _tl=(_pp['Comparison Table']||'').split('\n').find(function(l){return l.toLowerCase().indexOf('trust badge')>-1;});if(_tl){const _c=_tl.indexOf(':');if(_c>-1)trustBadge=_tl.substring(_c+1).replace(/\.$/,'').trim();}}
+  const autoBadge=title.replace(/^PromoPatriot\s+/i,'').split(' - ')[0].split(' \u2013 ')[0].trim();
+  const badge=rawBadge||trustBadge||autoBadge;
+
+  // Heading = title without PromoPatriot prefix
+  const rawHeading=g('d-sheading');
+  // Short heading: strip PromoPatriot + take part before first dash
+  const fullHeading=title.replace(/^PromoPatriot\s+/i,'');
+  const heading=rawHeading||fullHeading.split(' - ')[0].split(' – ')[0].trim();
+
+  bShort=tags;
+
+  const ft=[]; for(let i=0;i<(window._fc||0);i++) ft.push({cardLabel:g('d-fcl-'+i),chkLabel:g('d-fll-'+i),desc:g('d-fd-'+i)});
+  const cr=[]; for(let i=0;i<(window._cc||0);i++) cr.push({feat:g('d-cf-'+i),ours:g('d-co-'+i),theirs:g('d-ct-'+i)});
+  const ca=[]; for(let i=0;i<(window._kc||0);i++) ca.push({label:g('d-cl-'+i),text:g('d-ct2-'+i)});
+  const fq=[]; for(let i=0;i<(window._qc||0);i++) fq.push({q:g('d-fq-'+i),a:g('d-fa-'+i)});
+
+  const specs=buildSpecs(title,sku);
+
+  // ── SVG icons for feature cards (Widget 1 — 3 shown from first 3 B cols)
+  // Matching exact SVGs from the PDF
+  const card_svgs=[
+    // Office & Desk (rect + lines)
+    `<svg class="pdesc-feature-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`,
+    // Base Included (person/base shape)
+    `<svg class="pdesc-feature-icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+    // Gold Ball Top (star/award)
+    `<svg class="pdesc-feature-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>`,
+  ];
+
+  // ── SVG icons for Widget 2 features (6 items cycling)
+  const w2svgs=[
+    // Miniature size — small flag/rect
+    `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="14" width="24" height="16" rx="2" stroke-linejoin="round"/><line x1="12" y1="20" x2="36" y2="20"/></svg>`,
+    // Base included — pole with base (hero)
+    `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="38" rx="14" ry="4" stroke-width="2"/><line x1="24" y1="10" x2="24" y2="38" stroke-width="2.5"/><circle cx="24" cy="8" r="3" fill="rgba(245,158,11,0.8)"/></svg>`,
+    // Polyester — fabric grid
+    `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="28" height="28" rx="2" stroke-linejoin="round"/><path d="M10 18 L38 18" stroke-linecap="round"/><path d="M10 24 L38 24" stroke-linecap="round"/></svg>`,
+    // Bear print — circle target
+    `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="14" stroke-dasharray="3 3"/><circle cx="24" cy="24" r="8"/></svg>`,
+    // Gold ball finial — pole+ball
+    `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="12" r="6" fill="rgba(245,158,11,0.8)"/><line x1="24" y1="18" x2="24" y2="40" stroke-width="2.5"/></svg>`,
+    // Heat sealed edges — triangle
+    `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M10 38 L24 10 L38 38" stroke-linejoin="round" stroke-linecap="round"/><path d="M16 28 L32 28" stroke-linecap="round"/><path d="M8 40 L40 40" stroke-linecap="round" stroke-width="2.5"/></svg>`
+  ];
+
+  // ── Care SVG icons
+  const careSvgs=[
+    `<svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="2"/><circle cx="12" cy="15" r="3"/></svg>`,
+    `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>`,
+    `<svg viewBox="0 0 24 24"><path d="M3 8 Q7 5 11 8 Q15 11 19 8"/><path d="M3 13 Q7 10 11 13 Q15 16 19 13"/></svg>`,
+    `<svg viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>`,
+    `<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/></svg>`,
+    `<svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>`
+  ];
+
+  // Build HTML blocks
+  // Feature cards — first 3 B columns, card label only
+  const fCards=ft.slice(0,3).map((f,i)=>`      <div class="pdesc-feature-card">
+        <div class="pdesc-feature-icon-wrap">
+          ${card_svgs[i]||card_svgs[0]}
+        </div>
+        <div class="pdesc-feature-label">${f.cardLabel}</div>
+      </div>`).join('\n');
+
+  // Checklist — all B columns, bold chkLabel + desc
+  const chkl=ft.map(f=>`      <li class="pdesc-check-item">
+        <span class="pdesc-check-mark">&#10003;</span>
+        <span class="pdesc-check-text"><strong>${f.chkLabel}</strong> \u2014 ${f.desc}</span>
+      </li>`).join('\n');
+
+  // Spec rows
+  const specHTML=specs.map(([l,v])=>`              <tr><td>${l}</td><td>${v}</td></tr>`).join('\n');
+
+  // Widget 2 items — all B columns with unique SVGs
+  const w2items=ft.map((f,i)=>`
+    <!-- ${f.cardLabel} -->
+    <div class="flag-feature-item${i===1?' ff-hero':''}">
+      <div class="flag-feature-icon">
+        ${w2svgs[i%w2svgs.length]}
+      </div>
+      ${i===1?'<div class="ff-tag">Complete Kit</div>':''}
+      <p class="flag-feature-title">${f.cardLabel}</p>
+      <p class="flag-feature-desc">${f.desc}</p>
+    </div>`).join('\n');
+
+  // Comparison rows — fd-our-flag-gold for rows that contain stars/highlights
+  // Looking at PDF: row 0 (Included/Package) = gold, row 4 (Display) = gold
+  const cmpRows=cr.map((r,i)=>{
+    const isGold=i===0||r.ours.includes('\u2605')||r.ours.toLowerCase().includes('ready')||r.ours.toLowerCase().includes('pole + ');
+    return`        <tr${isGold?' class="fd-highlight-row"':''}>
+          <td>${r.feat}</td>
+          <td><span class="${isGold?'fd-our-flag-gold':'fd-our-flag'}">${r.ours}</span></td>
+          <td><span class="fd-typical">${r.theirs}</span></td>
+        </tr>`;
+  }).join('\n');
+
+  // Care items
+  const careHTML=ca.map((c,i)=>`      <li class="fd-care-item">
+        <div class="fd-care-icon">
+          ${careSvgs[i%careSvgs.length]}
+        </div>
+        <div>
+          <p class="fd-care-label">${c.label}</p>
+          <p class="fd-care-text">${c.text}</p>
+        </div>
+      </li>`).join('\n');
+
+  // FAQ items
+  const faqItems=fq.map((item,i)=>`
+    <div class="faq-item${i===0?' open':''}">
+      <button class="faq-question" aria-expanded="${i===0?'true':'false'}">
+        ${item.q}
+        <svg class="faq-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+      </button>
+      <div class="faq-answer">
+        <p>${item.a||''}</p>
+      </div>
+    </div>`).join('\n');
+
+  // ════════════════════════════════════════════════════
+  // FINAL HTML — exactly matching the PDF/WPBakery structure
+  // Widget 2 FIRST (dark), then Widget 1, then 3, then 4a, then 4b
+  // ════════════════════════════════════════════════════
+  bHTML=
+`<!-- Widget 2: Flag Features Section -->
+<!-- PromoPatriot ${title} - Features Section Widget -->
+<style>
+  .flag-features-section {
+    background-color: #0A1F3F;
+    padding: 40px 10px;
+    font-family: Inter, Arial, sans-serif;
+    box-sizing: border-box;
+    width: 100%;
+  }
+  .flag-features-section * { box-sizing: border-box; }
+  .flag-features-header { text-align: center; margin-bottom: 50px; }
+  .flag-features-header h2 { color: #ffffff; font-size: 28px; font-weight: 700; margin: 0 0 10px 0; letter-spacing: 0.5px; font-family: Inter, Arial, sans-serif; }
+  .flag-features-header p { color: #a0aec0; font-size: 15px; margin: 0; font-family: Inter, Arial, sans-serif; font-style: normal; }
+  .flag-features-header .ff-accent { display: inline-block; color: #f59e0b; font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; font-family: Inter, Arial, sans-serif; }
+  .flag-features-grid { display: flex; justify-content: space-around; align-items: flex-start; gap: 20px; flex-wrap: wrap; max-width: 100%; margin: 0 auto; }
+  .flag-feature-item { flex: 1 1 160px; max-width: 200px; text-align: center; padding: 10px; }
+  .flag-feature-icon { width: 90px; height: 90px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.25); margin: 0 auto 18px auto; display: flex; align-items: center; justify-content: center; transition: border-color 0.3s ease, transform 0.3s ease; }
+  .flag-feature-icon svg { width: 38px; height: 38px; stroke: rgba(255, 255, 255, 0.5); fill: none; stroke-width: 1.5; transition: stroke 0.3s ease; }
+  .flag-feature-item.ff-hero .flag-feature-icon { border-color: rgba(245, 158, 11, 0.6); }
+  .flag-feature-item.ff-hero .flag-feature-icon svg { stroke: rgba(245, 158, 11, 0.8); }
+  .flag-feature-item:hover .flag-feature-icon { border-color: rgba(255, 255, 255, 0.6); transform: translateY(-4px); }
+  .flag-feature-item:hover .flag-feature-icon svg { stroke: rgba(255, 255, 255, 0.9); }
+  .flag-feature-title { color: #ffffff; font-size: 14px; font-weight: 700; margin: 0 0 10px 0; font-family: Inter, Arial, sans-serif; letter-spacing: 0.3px; }
+  .flag-feature-desc { color: #8fa3bc; font-size: 12.5px; line-height: 1.65; margin: 0; font-family: Inter, Arial, sans-serif; }
+  .ff-tag { display: inline-block; background: #f59e0b; color: #0A1F3F; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; margin-bottom: 6px; font-family: Inter, Arial, sans-serif; }
+  @media (max-width: 600px) {
+    .flag-features-section { padding: 40px 20px; }
+    .flag-feature-item { flex: 1 1 140px; max-width: 160px; }
+    .flag-features-header h2 { font-size: 22px; }
+  }
+</style>
+
+<div class="flag-features-section" style="background-color:#0A1F3F !important;padding:40px 10px;font-family:Inter,Arial,sans-serif;box-sizing:border-box;width:100%;">
+  <div class="flag-features-header">
+    <div class="ff-accent">&#9733; ${accent}</div>
+    <h2>${w2h}</h2>
+    <p>${w2s}</p>
+  </div>
+  <div class="flag-features-grid">
+${w2items}
+  </div>
+</div>
+
+<div style="height:40px"></div>
+
+<div style="height:40px"></div>
+
+<!-- Widget 1: Product Page Layout (Description left / Specifications + Shipping & Returns right) -->
+<!-- PromoPatriot ${title} - OnlineFlagStore Widget -->
+<style>
+  .pp-row {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 56px;
+    width: 100%;
+    margin: 0;
+    align-items: start;
+    font-family: Arial, sans-serif;
+    padding: 0 clamp(16px, 4vw, 40px);
+  }
+  .pp-row * { box-sizing: border-box; }
+
+  /* ----------- LEFT: Description ----------- */
+  .pdesc-badge {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%);
+    color: #fff;
+    font-size: clamp(10.5px, 1.6vw, 11.5px);
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 7px 16px;
+    border-radius: 4px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(10, 31, 63, 0.25);
+    font-family: Arial, sans-serif;
+  }
+  .pdesc-badge span { color: #f59e0b; }
+  .pdesc-heading {
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #0A1F3F;
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+    letter-spacing: 0.3px;
+    font-family: Arial, sans-serif;
+    word-wrap: break-word;
+  }
+  .pdesc-heading::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 4px;
+    background: #0A1F3F;
+    border-radius: 2px;
+    margin-top: 14px;
+  }
+  .pdesc-text {
+    font-size: clamp(13.5px, 1.8vw, 14.5px);
+    color: #374151;
+    line-height: 1.75;
+    margin: 20px 0 26px 0;
+    font-family: Arial, sans-serif;
+  }
+  .pdesc-text strong { color: #0A1F3F; }
+  .pdesc-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 0 0 30px 0;
+  }
+  .pdesc-feature-card {
+    border: 1px solid #e5e7eb;
+    background: #fafbfc;
+    border-radius: 8px;
+    padding: 22px 10px;
+    text-align: center;
+    transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .pdesc-feature-card:hover { border-color: #0A1F3F; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(10, 31, 63, 0.1); }
+  .pdesc-feature-icon-wrap {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .pdesc-feature-icon { width: 19px; height: 19px; stroke: #f59e0b; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .pdesc-feature-label { font-size: clamp(10.5px, 1.6vw, 11.5px); font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: #0A1F3F; font-family: Arial, sans-serif; }
+  .pdesc-checklist { list-style: none; padding: 0; margin: 0; }
+  .pdesc-check-item { display: flex; gap: 12px; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid #f3f4f6; }
+  .pdesc-check-item:last-child { border-bottom: none; }
+  .pdesc-check-mark { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: #0A1F3F; color: #fff; font-size: 11px; line-height: 20px; text-align: center; margin-top: 1px; }
+  .pdesc-check-text { font-size: clamp(13px, 1.8vw, 14px); color: #374151; line-height: 1.6; font-family: Arial, sans-serif; }
+  .pdesc-check-text strong { color: #0A1F3F; font-weight: 700; }
+
+  /* ----------- RIGHT: Specifications / Shipping & Returns ----------- */
+  .pd-wrap { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(10, 31, 63, 0.05); }
+  .pd-item { border-top: 1px solid #e5e7eb; background: #fff; }
+  .pd-item:first-child { border-top: none; }
+  .pd-item.open { background: #fafbfc; }
+  .pd-trigger { width: 100%; background: none; border: none; padding: 20px 22px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-align: left; gap: 12px; }
+  .pd-trigger-label { font-size: 15px; font-weight: 700; color: #0A1F3F; font-family: Arial, sans-serif; }
+  .pd-chevron { width: 18px; height: 18px; flex-shrink: 0; stroke: #6b7280; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+  .pd-item.open .pd-chevron { transform: rotate(180deg); stroke: #0A1F3F; }
+  .pd-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .pd-item.open .pd-body { max-height: 1400px; }
+  .pd-content { padding: 0 22px 24px; }
+  .pd-spec-table { width: 100%; border-collapse: collapse; font-size: 13.5px; font-family: Arial, sans-serif; }
+  .pd-spec-table tr { border-bottom: 1px solid #eef0f2; }
+  .pd-spec-table tr:last-child { border-bottom: none; }
+  .pd-spec-table td { padding: 11px 8px; vertical-align: top; line-height: 1.5; }
+  .pd-spec-table td:first-child { font-weight: 700; color: #0A1F3F; width: 42%; white-space: nowrap; }
+  .pd-spec-table td:last-child { color: #374151; }
+  .pd-shipping-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 18px; }
+  .pd-shipping-item { display: flex; gap: 14px; align-items: flex-start; }
+  .pd-shipping-icon { width: 38px; height: 38px; flex-shrink: 0; background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .pd-shipping-icon svg { width: 18px; height: 18px; stroke: #f59e0b; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .pd-shipping-label { font-size: 13.5px; font-weight: 700; color: #0A1F3F; margin: 0 0 3px 0; font-family: Arial, sans-serif; }
+  .pd-shipping-text { font-size: 13px; color: #4b5563; margin: 0; line-height: 1.6; font-family: Arial, sans-serif; }
+
+  /* ================ RESPONSIVE ================ */
+  @media (max-width: 860px) { .pp-row { grid-template-columns: 1fr; gap: 32px; } }
+  @media (max-width: 640px) {
+    .pp-row { gap: 28px; }
+    .pdesc-feature-grid { grid-template-columns: repeat(2, 1fr); }
+    .pd-trigger { padding: 16px 16px; }
+    .pd-content { padding: 0 16px 20px; }
+  }
+  @media (max-width: 480px) {
+    .pdesc-badge { font-size: 10px; padding: 6px 12px; }
+    .pdesc-feature-grid { grid-template-columns: 1fr; gap: 10px; }
+    .pdesc-feature-card { display: flex; align-items: center; gap: 12px; text-align: left; padding: 14px 16px; }
+    .pdesc-feature-icon-wrap { margin: 0; }
+    .pdesc-check-item { padding: 13px 0; }
+    .pd-spec-table tr { display: flex; flex-direction: column; padding: 8px 0; }
+    .pd-spec-table td { padding: 2px 0; white-space: normal; }
+    .pd-spec-table td:first-child { width: 100%; color: #0A1F3F; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; }
+  }
+</style>
+
+<div class="pp-row">
+
+  <!-- LEFT COLUMN: Description -->
+  <div class="pp-col-left">
+    <div class="pdesc-badge">&#9733; <span>${badge}</span> &nbsp;&middot;&nbsp; About This Product</div>
+
+    <h2 class="pdesc-heading">${heading}</h2>
+
+    <p class="pdesc-text">${desc}</p>
+
+    <div class="pdesc-feature-grid">
+${fCards}
+    </div>
+
+    <ul class="pdesc-checklist">
+${chkl}
+    </ul>
+  </div>
+
+  <!-- RIGHT COLUMN: Specifications / Shipping & Returns -->
+  <div class="pp-col-right">
+    <div class="pd-wrap">
+
+      <!-- Specifications -->
+      <div class="pd-item open">
+        <button class="pd-trigger" aria-expanded="true">
+          <span class="pd-trigger-label">Specifications</span>
+          <svg class="pd-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        <div class="pd-body">
+          <div class="pd-content">
+            <table class="pd-spec-table">
+${specHTML}
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shipping & Returns -->
+      <div class="pd-item">
+        <button class="pd-trigger" aria-expanded="false">
+          <span class="pd-trigger-label">Shipping &amp; Returns</span>
+          <svg class="pd-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </button>
+        <div class="pd-body">
+          <div class="pd-content">
+            <ul class="pd-shipping-list">
+              <li class="pd-shipping-item">
+                <div class="pd-shipping-icon">
+                  <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                </div>
+                <div>
+                  <p class="pd-shipping-label">Free Standard Shipping</p>
+                  <p class="pd-shipping-text">Free on all orders over $75. Standard delivery takes 3&ndash;5 business days. Expedited options available at checkout. Orders placed before 2 PM EST ship same day.</p>
+                </div>
+              </li>
+              <li class="pd-shipping-item">
+                <div class="pd-shipping-icon">
+                  <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+                </div>
+                <div>
+                  <p class="pd-shipping-label">30-Day Hassle-Free Returns</p>
+                  <p class="pd-shipping-text">Not 100% satisfied? Return your flag within 30 days for a full refund. Items must be in original, unused condition.</p>
+                </div>
+              </li>
+              <li class="pd-shipping-item">
+                <div class="pd-shipping-icon">
+                  <svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <div>
+                  <p class="pd-shipping-label">6-Month Quality Warranty</p>
+                  <p class="pd-shipping-text">Every PromoPatriot flag is backed by a 6-month warranty against manufacturing defects.</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div style="height:40px"></div>
+
+<div style="height:40px"></div>
+
+<!-- Widget 3: Why Choose Us + Care & Maintenance -->
+<!-- PromoPatriot ${title} - Comparison & Care Widget -->
+<style>
+  .fd-wrap { font-family: Inter, Arial, sans-serif; display: flex; gap: 30px; max-width: 100%; margin: 0 auto; padding: 40px 20px; box-sizing: border-box; align-items: flex-start; flex-wrap: wrap; }
+  .fd-wrap * { box-sizing: border-box; }
+  .fd-left { flex: 1 1 480px; min-width: 300px; }
+  .fd-eyebrow { color: #0A1F3F; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 10px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-heading { color: #111827; font-size: 28px; font-weight: 700; margin: 0 0 24px 0; line-height: 1.2; font-family: Inter, Arial, sans-serif; }
+  .fd-table { width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
+  .fd-table thead tr { background-color: #0A1F3F; }
+  .fd-table thead th { color: #ffffff; font-size: 13px; font-weight: 600; padding: 14px 16px; text-align: left; font-family: Inter, Arial, sans-serif; }
+  .fd-table tbody tr { border-bottom: 1px solid #e5e7eb; }
+  .fd-table tbody tr:last-child { border-bottom: none; }
+  .fd-table tbody td { padding: 14px 16px; font-size: 14px; color: #374151; font-family: Inter, Arial, sans-serif; }
+  .fd-table tbody td:first-child { font-weight: 600; color: #111827; }
+  .fd-table tbody tr.fd-highlight-row { background: #fffbf0; }
+  .fd-our-flag { color: #008236; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .fd-our-flag::before { content: '✓'; color: #008236; font-weight: 700; }
+  .fd-our-flag-gold { color: #b45309; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+  .fd-our-flag-gold::before { content: '★'; color: #f59e0b; font-weight: 700; }
+  .fd-typical { color: #9ca3af; }
+  .fd-badges { display: flex; gap: 16px; flex-wrap: wrap; }
+  .fd-badge { flex: 1 1 45%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; background: #fafbfc; display: flex; gap: 12px; align-items: flex-start; }
+  .fd-badge-icon { width: 32px; height: 32px; flex-shrink: 0; }
+  .fd-badge-icon svg { width: 32px; height: 32px; stroke: #0A1F3F; fill: none; stroke-width: 1.8; }
+  .fd-badge-title { font-size: 14px; font-weight: 700; color: #111827; margin: 0 0 4px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-badge-desc { font-size: 12.5px; color: #6b7280; margin: 0; line-height: 1.5; font-family: Inter, Arial, sans-serif; }
+  .fd-right { flex: 1 1 380px; min-width: 280px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; background: #ffffff; }
+  .fd-care-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 6px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-care-sub { font-size: 13.5px; color: #6b7280; margin: 0 0 28px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-care-list { list-style: none; padding: 0; margin: 0 0 28px 0; display: flex; flex-direction: column; gap: 22px; }
+  .fd-care-item { display: flex; gap: 16px; align-items: flex-start; }
+  .fd-care-icon { width: 38px; height: 38px; flex-shrink: 0; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .fd-care-icon svg { width: 20px; height: 20px; stroke: #374151; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .fd-care-label { font-size: 14.5px; font-weight: 700; color: #111827; margin: 0 0 4px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-care-text { font-size: 13px; color: #4b5563; margin: 0; line-height: 1.55; font-family: Inter, Arial, sans-serif; }
+  @media (max-width: 700px) { .fd-wrap { padding: 24px 14px; gap: 20px; } .fd-heading { font-size: 22px; } .fd-badge { flex: 1 1 100%; } }
+</style>
+
+<div class="fd-wrap">
+
+  <!-- LEFT: Why Choose Us -->
+  <div class="fd-left">
+    <p class="fd-eyebrow">Why Choose Us</p>
+    <h2 class="fd-heading">The Difference is in the Details</h2>
+
+    <table class="fd-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Our Flag</th>
+          <th>Typical Flag</th>
+        </tr>
+      </thead>
+      <tbody>
+${cmpRows}
+      </tbody>
+    </table>
+
+    <div class="fd-badges">
+      <div class="fd-badge">
+        <div class="fd-badge-icon">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 3 L20 11 L29 12.5 L22.5 19 L24 28 L16 24 L8 28 L9.5 19 L3 12.5 L12 11 Z"/></svg>
+        </div>
+        <div>
+          <p class="fd-badge-title">Satisfaction Guaranteed</p>
+          <p class="fd-badge-desc">30-day hassle-free returns. If you're not satisfied, we'll make it right.</p>
+        </div>
+      </div>
+      <div class="fd-badge">
+        <div class="fd-badge-icon">
+          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 4 L26 8 L26 18 C26 23 21 27 16 29 C11 27 6 23 6 18 L6 8 Z"/><path d="M12 16 L15 19 L20 13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <p class="fd-badge-title">6-Month Warranty</p>
+          <p class="fd-badge-desc">Full coverage against manufacturing defects on every desk flag set we sell.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Care & Maintenance -->
+  <div class="fd-right">
+    <h3 class="fd-care-title">Care &amp; Maintenance</h3>
+    <p class="fd-care-sub">Keep your mini desk flag looking sharp in your office</p>
+    <ul class="fd-care-list">
+${careHTML}
+    </ul>
+  </div>
+
+</div>
+
+<div style="height:40px"></div>
+
+<div style="height:40px"></div>
+
+<!-- Widget 4a: Stats Bar -->
+<!-- PromoPatriot ${title} - Stats Widget -->
+<style>
+  .fs-stats-wrap { background: #ffffff; padding: 20px; box-sizing: border-box; font-family: Inter, Arial, sans-serif; max-width: 100%; margin: 0 auto; }
+  .fs-stats-wrap * { box-sizing: border-box; }
+  .fs-stats-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+  .fs-stat-card { flex: 1 1 240px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px 24px; display: flex; align-items: flex-start; gap: 16px; background: #ffffff; }
+  .fs-stat-card.fs-gold { border-color: #fde68a; background: #fffbeb; }
+  .fs-stat-card.fs-gold .fs-stat-number { color: #b45309; }
+  .fs-stat-card.fs-gold .fs-stat-label { color: #92400e; }
+  .fs-stat-card.fs-gold .fs-stat-icon { background: #fef3c7; }
+  .fs-stat-card.fs-gold .fs-stat-icon svg { stroke: #b45309; }
+  .fs-stat-icon { width: 42px; height: 42px; flex-shrink: 0; background: #f1f3f7; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .fs-stat-icon svg { width: 22px; height: 22px; stroke: #0A1F3F; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .fs-stat-top { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .fs-stat-number { font-size: 28px; font-weight: 800; color: #0A1F3F; line-height: 1; letter-spacing: -0.5px; }
+  .fs-stat-label { font-size: 15px; font-weight: 700; color: #0A1F3F; }
+  .fs-stat-sub { font-size: 12.5px; color: #6b7280; margin: 0; line-height: 1.4; }
+  @media (max-width: 600px) { .fs-stat-card { flex: 1 1 100%; } .fs-stats-wrap { padding: 14px; } }
+</style>
+
+<div class="fs-stats-wrap">
+  <div class="fs-stats-grid">
+
+    <!-- Complete Set -->
+    <div class="fs-stat-card fs-gold">
+      <div class="fs-stat-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+      </div>
+      <div class="fs-stat-content">
+        <div class="fs-stat-top"><span class="fs-stat-number">Base</span><span class="fs-stat-label">Included</span></div>
+        <p class="fs-stat-sub">Complete 4x6&quot; flag, 11&quot; pole &amp; stand set</p>
+      </div>
+    </div>
+
+    <!-- Mini Profile -->
+    <div class="fs-stat-card">
+      <div class="fs-stat-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="14" width="4" height="7" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="17" rx="1"/></svg>
+      </div>
+      <div class="fs-stat-content">
+        <div class="fs-stat-top"><span class="fs-stat-number">4x6</span><span class="fs-stat-label">Mini Desk Size</span></div>
+        <p class="fs-stat-sub">Ideal for offices, desks &amp; classrooms</p>
+      </div>
+    </div>
+
+    <!-- 50K+ Flags Sold -->
+    <div class="fs-stat-card">
+      <div class="fs-stat-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      </div>
+      <div class="fs-stat-content">
+        <div class="fs-stat-top"><span class="fs-stat-number">50K+</span><span class="fs-stat-label">Flags Sold</span></div>
+        <p class="fs-stat-sub">To businesses &amp; organizations nationwide</p>
+      </div>
+    </div>
+
+    <!-- 97% Recommend -->
+    <div class="fs-stat-card">
+      <div class="fs-stat-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>
+      </div>
+      <div class="fs-stat-content">
+        <div class="fs-stat-top"><span class="fs-stat-number">97%</span><span class="fs-stat-label">Would Recommend</span></div>
+        <p class="fs-stat-sub">Based on verified customer surveys</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div style="height:40px"></div>
+
+<div style="height:40px"></div>
+
+<!-- Widget 4b: FAQ Section -->
+<!-- PromoPatriot ${title} - FAQ Accordion Widget -->
+<style>
+  .faq-wrap { max-width: 100%; margin: 0 auto; padding: 50px 20px; font-family: Inter, Arial, sans-serif; box-sizing: border-box; }
+  .faq-wrap * { box-sizing: border-box; }
+  .faq-heading { text-align: center; font-size: 30px; font-weight: 800; color: #1a2744; margin: 0 0 8px 0; font-family: Inter, Arial, sans-serif; }
+  .faq-subheading { text-align: center; font-size: 14px; color: #6b7280; margin: 0 0 36px 0; font-family: Inter, Arial, sans-serif; }
+  .faq-list { display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #ffffff; }
+  .faq-question { width: 100%; background: none; border: none; padding: 20px 22px; text-align: left; font-size: 15px; font-weight: 700; color: #1a2744; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: Inter, Arial, sans-serif; line-height: 1.4; }
+  .faq-question:hover { background: #f9fafb; }
+  .faq-chevron { width: 20px; height: 20px; flex-shrink: 0; stroke: #6b7280; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); stroke: #1a2744; }
+  .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.3s ease; padding: 0 22px; }
+  .faq-item.open .faq-answer { max-height: 400px; padding: 0 22px 20px; }
+  .faq-answer p { margin: 0; font-size: 14px; color: #4b5563; line-height: 1.7; font-family: Inter, Arial, sans-serif; }
+  @media (max-width: 600px) { .faq-heading { font-size: 22px; } .faq-question { font-size: 14px; padding: 16px 16px; } .faq-item.open .faq-answer { padding: 0 16px 16px; } }
+</style>
+
+<div class="faq-wrap">
+  <h2 class="faq-heading">Frequently Asked Questions</h2>
+  <p class="faq-subheading">Everything you need to know about the ${title}</p>
+
+  <div class="faq-list">
+${faqItems}
+  </div>
+</div>
+
+<script type="text/javascript">
+(function(){
+  function ppToggle(btn){
+    var item=btn.closest('.pd-item,.faq-item');
+    var container=btn.closest('.pd-wrap,.faq-list');
+    var isOpen=item.classList.contains('open');
+    if(container){container.querySelectorAll('.pd-item,.faq-item').forEach(function(i){i.classList.remove('open');var t=i.querySelector('.pd-trigger,.faq-question');if(t)t.setAttribute('aria-expanded','false');});}
+    if(!isOpen){item.classList.add('open');btn.setAttribute('aria-expanded','true');}
+  }
+  function ppInit(){document.querySelectorAll('.pd-trigger,.faq-question').forEach(function(b){b.addEventListener('click',function(){ppToggle(this);});});}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',ppInit);}else{ppInit();}
+})();
+<\/script>`;
+
+  document.getElementById('empty').style.display='none';
+  document.getElementById('cout').style.display='block';
+  document.getElementById('cout').textContent=bHTML;
+  document.getElementById('prev').srcdoc=bHTML;
+  document.getElementById('bcopy').style.display='inline-block';
+  document.getElementById('bpush').disabled=false;
+  setSt('ready','HTML Ready');
+}
+
+async function pushToWoo(){
+  const pid=document.getElementById('wid').value.trim();
+  if(!pid){alert('Enter the WooCommerce Product ID.');return;}
+  if(!bHTML){alert('Build HTML first.');return;}
+  document.getElementById('bpush').disabled=true;
+  setSt('idle','Uploading...');
+  const log=document.getElementById('plog');
+  log.style.display='block';log.innerHTML='Pushing to WooCommerce...';
+  try{
+    // Collect extra fields
+    const pushTitle=document.getElementById('d-title')?document.getElementById('d-title').value.trim():'';
+    const pushSku=document.getElementById('d-sku')?document.getElementById('d-sku').value.trim():'';
+    const pushPrice=document.getElementById('d-price')?document.getElementById('d-price').value.trim():'';
+    const pushWeight=document.getElementById('d-weight')?document.getElementById('d-weight').value.trim():'';
+    const pushSeoTitle=document.getElementById('d-seo-title')?document.getElementById('d-seo-title').value.trim():'';
+    const pushSeoMeta=document.getElementById('d-seo-meta')?document.getElementById('d-seo-meta').value.trim():'';
+    const pushSeoKw=document.getElementById('d-seo-kw')?document.getElementById('d-seo-kw').value.trim():'';
+
+    const payload={
+      product_id:pid,
+      description:bHTML,
+      short_description:bShort
+    };
+    if(pushTitle) payload.name=pushTitle;
+    if(pushSku) payload.sku=pushSku;
+    if(pushPrice) payload.regular_price=pushPrice;
+    if(pushWeight) payload.weight=pushWeight;
+    if(pushSeoTitle||pushSeoMeta||pushSeoKw) payload.seo={title:pushSeoTitle,description:pushSeoMeta,focus_keyword:pushSeoKw};
+
+    const res=await fetch('/woo-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await res.json();
+    if(res.ok){
+      log.innerHTML='<span class="ok">&#10003; Product #'+pid+' updated!</span><br>'+(d.name?'Name: '+d.name+'<br>':'')+(d.permalink?'<a href="'+d.permalink+'" target="_blank" style="color:#065f46">View on store &#8599;</a>':'');
+      setSt('ready','Uploaded');
+    }else{
+      log.innerHTML='<span class="err">&#10007; Failed ('+res.status+')</span><br>'+(d.message||JSON.stringify(d));
+      setSt('idle','Error');
+    }
+  }catch(e){
+    log.innerHTML='<span class="err">&#10007; Network error</span><br>'+e.message+'<br><small>Make sure server.py is running</small>';
+    setSt('idle','Error');
+  }
+  document.getElementById('bpush').disabled=false;
+}
+
+function setSt(t,tx){const el=document.getElementById('stat');el.className='bdg bdg-'+(t==='ready'?'ready':'idle');el.textContent=tx}
+function copyHTML(){navigator.clipboard.writeText(bHTML).then(()=>{const b=document.getElementById('bcopy');b.textContent='Copied!';b.classList.add('dn');setTimeout(()=>{b.textContent='Copy HTML';b.classList.remove('dn')},2000)})}
+function swTab(e,tab){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.pane').forEach(t=>t.classList.remove('active'));e.target.classList.add('active');document.getElementById('pane-'+tab).classList.add('active')}
+</script>
+</body>
+</html>

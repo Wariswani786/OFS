@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: promopatriot-uploader
+    env: python
+    buildCommand: "echo 'No build needed'"
+    startCommand: "python server.py"
+    envVars:
+      - key: WC_HOST
+        value: onlineflagstore.com
+      - key: WC_CONSUMER_KEY
+        value: ck_5e487cee74d8f56491115de42429febe14f68b0c
+      - key: WC_CONSUMER_SECRET
+        value: cs_c218e1464bc03b488dfff9edfcfe6185c1dea10e
+      - key: PRIORITY_USER
+        value: API
+      - key: PRIORITY_PASS
+        value: Aa12345
