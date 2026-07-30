@@ -415,9 +415,9 @@ function g(id){const el=document.getElementById(id);return el?el.value.trim():''
 // ── Build HTML ─────────────────────────────────────────────────────────
 function buildHTML(){
   const title=g('d-title'),desc=g('d-desc'),sku=g('d-sku'),tags=g('d-tags');
-  const accent=g('d-accent')||'Tabletop &amp; Workspace Decor';
-  const w2h=g('d-w2h')||'Mini Desk Flag Features';
-  const w2s=g('d-w2s')||'Complete set with pole and base';
+  const accent=g('d-accent')||'About This Product';
+  const w2h=g('d-w2h')||'Key Product Features';
+  const w2s=g('d-w2s')||'Everything you need in one complete set';
 
   // Badge: manual override OR auto from title (strip PromoPatriot, take before first " - ")
   const rawBadge=g('d-badge');
@@ -501,11 +501,11 @@ function buildHTML(){
   // Widget 2 items — all B columns with unique SVGs
   const w2items=ft.map((f,i)=>`
     <!-- ${f.cardLabel} -->
-    <div class="flag-feature-item${i===1?' ff-hero':''}">
+    <div class="flag-feature-item">
       <div class="flag-feature-icon">
         ${w2svgs[i%w2svgs.length]}
       </div>
-      ${i===1?'<div class="ff-tag">Complete Kit</div>':''}
+
       <p class="flag-feature-title">${f.cardLabel}</p>
       <p class="flag-feature-desc">${f.desc}</p>
     </div>`).join('\n');
@@ -513,7 +513,7 @@ function buildHTML(){
   // Comparison rows — fd-our-flag-gold for rows that contain stars/highlights
   // Looking at PDF: row 0 (Included/Package) = gold, row 4 (Display) = gold
   const cmpRows=cr.map((r,i)=>{
-    const isGold=i===0||r.ours.includes('\u2605')||r.ours.toLowerCase().includes('ready')||r.ours.toLowerCase().includes('pole + ');
+    const isGold=i===0||r.ours.includes('\u2605');
     return`        <tr${isGold?' class="fd-highlight-row"':''}>
           <td>${r.feat}</td>
           <td><span class="${isGold?'fd-our-flag-gold':'fd-our-flag'}">${r.ours}</span></td>
@@ -902,7 +902,7 @@ ${cmpRows}
         </div>
         <div>
           <p class="fd-badge-title">6-Month Warranty</p>
-          <p class="fd-badge-desc">Full coverage against manufacturing defects on every desk flag set we sell.</p>
+          <p class="fd-badge-desc">Full coverage against manufacturing defects on every product we sell.</p>
         </div>
       </div>
     </div>
@@ -911,7 +911,7 @@ ${cmpRows}
   <!-- RIGHT: Care & Maintenance -->
   <div class="fd-right">
     <h3 class="fd-care-title">Care &amp; Maintenance</h3>
-    <p class="fd-care-sub">Keep your mini desk flag looking sharp in your office</p>
+    <p class="fd-care-sub">Keep your product looking its best</p>
     <ul class="fd-care-list">
 ${careHTML}
     </ul>
@@ -953,8 +953,8 @@ ${careHTML}
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
       </div>
       <div class="fs-stat-content">
-        <div class="fs-stat-top"><span class="fs-stat-number">Base</span><span class="fs-stat-label">Included</span></div>
-        <p class="fs-stat-sub">Complete 4x6&quot; flag, 11&quot; pole &amp; stand set</p>
+        <div class="fs-stat-top"><span class="fs-stat-number">50K+</span><span class="fs-stat-label">Flags Sold</span></div>
+        <p class="fs-stat-sub">Trusted by homes &amp; businesses nationwide</p>
       </div>
     </div>
 
@@ -964,8 +964,8 @@ ${careHTML}
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="14" width="4" height="7" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="17" rx="1"/></svg>
       </div>
       <div class="fs-stat-content">
-        <div class="fs-stat-top"><span class="fs-stat-number">4x6</span><span class="fs-stat-label">Mini Desk Size</span></div>
-        <p class="fs-stat-sub">Ideal for offices, desks &amp; classrooms</p>
+        <div class="fs-stat-top"><span class="fs-stat-number">30</span><span class="fs-stat-label">Day Returns</span></div>
+        <p class="fs-stat-sub">Hassle-free, no questions asked</p>
       </div>
     </div>
 
@@ -975,8 +975,8 @@ ${careHTML}
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       </div>
       <div class="fs-stat-content">
-        <div class="fs-stat-top"><span class="fs-stat-number">50K+</span><span class="fs-stat-label">Flags Sold</span></div>
-        <p class="fs-stat-sub">To businesses &amp; organizations nationwide</p>
+        <div class="fs-stat-top"><span class="fs-stat-number">6</span><span class="fs-stat-label">Mo. Warranty</span></div>
+        <p class="fs-stat-sub">Against manufacturing defects</p>
       </div>
     </div>
 
