@@ -1163,7 +1163,7 @@ async function startBulkRun(){
     const p = subset[i];
     const title = (p['Title']||'').substring(0,50);
     const sku   = p['Part no/SKU']||'';
-    const url   = p['URL']||'';
+    
 
     // Progress
     const pct = Math.round((i/total)*100);
@@ -1179,28 +1179,17 @@ async function startBulkRun(){
     }
 
     bulkLog(`[${i+1}/${total}] ${sku} — ${title}`, 'info');
+     // 1. Get WooCommerce Product ID directly from Excel
+    const pid = String(p['Product ID'] || '').trim();
+    if (!pid) {
+       bulkLog('  ✗ Product ID missing in Excel','err');
+       failed++;
+       continue;
+    }
 
+    bulkLog(`  ✓ Using Product ID: #${pid}`,'ok');
     // 1. Get WooCommerce product ID from URL slug
-    if(!url){bulkLog('  ✗ No URL — skipped','err');skipped++;continue;}
-    const slug = url.replace(/\/$/,'').split('/').pop();
-
-    let pid = null;
-    try{
-      const idRes = await fetch('/woo-id-lookup?slug='+encodeURIComponent(slug));
-      const idData = await idRes.json();
-      pid = idData.id;
-    }catch(e){
-      bulkLog('  ✗ ID lookup failed: '+e.message,'err');
-      failed++;
-      continue;
-    }
-
-    if(!pid){
-      bulkLog('  ✗ Product not found in WooCommerce','err');
-      failed++;
-      continue;
-    }
-    bulkLog(`  ✓ Found Product ID: #${pid}`,'ok');
+    
 
     // 2. Select product to populate menus
     const prodIdx = prods.indexOf(p);
