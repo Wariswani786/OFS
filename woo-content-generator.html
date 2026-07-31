@@ -144,30 +144,6 @@ select:focus,input:focus{border-color:var(--navy)}
     </button>
     <div class="plog" id="plog"></div>
 
-    <!-- Bulk Fix -->
-    <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:10px;">
-      <div class="sec" style="margin-bottom:8px;">Bulk Fix &middot; Remove from All Products</div>
-      <div style="font-size:11px;color:var(--mu);margin-bottom:8px;line-height:1.5;">Remove a stat card from all products in a range. Gets products from WooCommerce and strips the matching HTML.</div>
-      <div class="fld">
-        <label>Search text to remove (e.g. fs-stat-card content)</label>
-        <input type="text" id="bulk-search" placeholder=">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
-        <div class="fld" style="margin-bottom:0">
-          <label>From page</label>
-          <input type="text" id="bulk-page" value="1" placeholder="1">
-        </div>
-        <div class="fld" style="margin-bottom:0">
-          <label>Per page (max 100)</label>
-          <input type="text" id="bulk-perpage" value="100" placeholder="100">
-        </div>
-      </div>
-      <button onclick="bulkFix()" style="width:100%;padding:9px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;" id="bbulk">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
-        Run Bulk Fix
-      </button>
-      <div id="bulk-log" style="margin-top:8px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:9px 11px;font-size:11px;line-height:1.7;display:none;max-height:200px;overflow-y:auto;"></div>
-    </div>
   </div>
 </div>
 
@@ -182,6 +158,7 @@ select:focus,input:focus{border-color:var(--navy)}
   <div class="tabs">
     <button class="tab active" onclick="swTab(event,'code')">HTML Code</button>
     <button class="tab" onclick="swTab(event,'preview')">Preview</button>
+    <button class="tab" onclick="swTab(event,'bulk')">&#9881; Bulk Run</button>
   </div>
   <div class="pane active" id="pane-code">
     <div class="empty" id="empty">
@@ -192,6 +169,49 @@ select:focus,input:focus{border-color:var(--navy)}
   </div>
   <div class="pane" id="pane-preview">
     <iframe id="prev" style="width:100%;border:1px solid var(--bd);border-radius:var(--r);min-height:calc(100vh - 165px)" sandbox="allow-scripts"></iframe>
+  </div>
+  <div class="pane" id="pane-bulk">
+    <div style="background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:12px;">
+      <div class="sec" style="margin-bottom:10px;">Bulk Run &middot; Process All Products in Excel</div>
+      <p style="font-size:11px;color:var(--mu);margin-bottom:12px;line-height:1.6;">Loads every product from the Excel file, builds HTML for each one, looks up the WooCommerce Product ID from the URL column, and pushes everything automatically.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Start at row</label>
+          <input type="number" id="bulk-start" value="1" min="1" style="width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:7px;font-size:12px;">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">End at row (0 = all)</label>
+          <input type="number" id="bulk-end" value="0" min="0" style="width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:7px;font-size:12px;">
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px;font-weight:600;color:var(--navy);display:block;margin-bottom:3px;">Delay between products (ms)</label>
+        <input type="number" id="bulk-delay" value="1000" min="500" style="width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:7px;font-size:12px;">
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="startBulkRun()" id="btn-bulk-run" style="flex:1;padding:10px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:var(--r);font-size:12.5px;font-weight:700;cursor:pointer;">
+          &#9654; Start Bulk Run
+        </button>
+        <button onclick="stopBulkRun()" id="btn-bulk-stop" style="padding:10px 16px;background:#dc2626;color:#fff;border:none;border-radius:var(--r);font-size:12.5px;font-weight:700;cursor:pointer;display:none;">
+          &#9646;&#9646; Stop
+        </button>
+      </div>
+    </div>
+    <!-- Progress -->
+    <div id="bulk-progress" style="display:none;background:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:12px;margin-bottom:12px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:12px;font-weight:700;color:var(--navy)" id="bulk-progress-text">0 / 0</span>
+        <span style="font-size:11px;color:var(--mu)" id="bulk-eta"></span>
+      </div>
+      <div style="background:#f3f4f6;border-radius:20px;height:8px;overflow:hidden;">
+        <div id="bulk-bar" style="height:8px;background:linear-gradient(90deg,#7c3aed,#6d28d9);border-radius:20px;width:0%;transition:width 0.3s;"></div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--mu);" id="bulk-current"></div>
+    </div>
+    <!-- Log -->
+    <div id="bulk-log-wrap" style="display:none;background:#0f172a;border-radius:var(--r);padding:12px;max-height:calc(100vh - 400px);overflow-y:auto;font-family:monospace;font-size:11px;line-height:1.7;">
+      <div id="bulk-log-content"></div>
+    </div>
   </div>
 </div>
 </div>
@@ -254,6 +274,26 @@ function onSelect(){
   document.getElementById('bbuild').disabled=false;
   if(p['Part no/SKU'])document.getElementById('psku').value=p['Part no/SKU'];
   renderMenus(p);
+  // Auto-lookup product ID from URL slug
+  const productUrl = p['URL']||'';
+  if(productUrl){
+    const slug = productUrl.replace(/\/$/,'').split('/').pop();
+    if(slug){
+      document.getElementById('wid').value='';
+      document.getElementById('wid').placeholder='Looking up ID for: '+slug.substring(0,30)+'...';
+      fetch('/woo-id-lookup?slug='+encodeURIComponent(slug))
+        .then(r=>r.json())
+        .then(d=>{
+          if(d.id){
+            document.getElementById('wid').value=d.id;
+            document.getElementById('wid').placeholder='e.g. 1042';
+          } else {
+            document.getElementById('wid').placeholder='Not found — enter manually';
+          }
+        })
+        .catch(()=>{ document.getElementById('wid').placeholder='Lookup failed — enter manually'; });
+    }
+  }
 }
 
 function xe(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
@@ -379,9 +419,9 @@ function renderMenus(p){
   // Determine accent/heading defaults from title
   const tl=(p['Title']||'').toLowerCase();
   const isDesk=tl.includes('desk')||tl.includes('stick flag')||tl.includes('4 x 6')||tl.includes('4x6');
-  const defaultAccent=isDesk?'Tabletop &amp; Workspace Decor':'About This Product';
-  const defaultW2H=isDesk?'Mini Desk Flag Features':'Key Product Features';
-  const defaultW2S=isDesk?'Complete set with pole and base \u2014 instant display for offices and classrooms':'Everything you need in one complete set';
+  const defaultAccent='About This Product';
+  const defaultW2H='Key Product Features';
+  const defaultW2S='Everything you need to know';
 
   const secs=[
     {id:'basic',icon:'&#x1F4CB;',title:'Basic Info',
@@ -442,7 +482,7 @@ function buildHTML(){
   const title=g('d-title'),desc=g('d-desc'),sku=g('d-sku'),tags=g('d-tags');
   const accent=g('d-accent')||'About This Product';
   const w2h=g('d-w2h')||'Key Product Features';
-  const w2s=g('d-w2s')||'Everything you need in one complete set';
+  const w2s=g('d-w2s')||'Everything you need to know';
 
   // Badge: manual override OR auto from title (strip PromoPatriot, take before first " - ")
   const rawBadge=g('d-badge');
@@ -829,12 +869,6 @@ ${specHTML}
                   <p class="pd-shipping-text">Not 100% satisfied? Return your flag within 30 days for a full refund. Items must be in original, unused condition.</p>
                 </div>
               </li>
-              <li class="pd-shipping-item">
-                <div class="pd-shipping-icon">
-                  <svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
-                </div>
-                
-              </li>
             </ul>
           </div>
         </div>
@@ -918,11 +952,8 @@ ${cmpRows}
           <p class="fd-badge-desc">30-day hassle-free returns. If you're not satisfied, we'll make it right.</p>
         </div>
       </div>
-      <div class="fd-badge">
-        <div class="fd-badge-icon">
-          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 4 L26 8 L26 18 C26 23 21 27 16 29 C11 27 6 23 6 18 L6 8 Z"/><path d="M12 16 L15 19 L20 13" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <p class="fd-badge-desc">Full coverage against manufacturing defects on every product we sell.</p>
         </div>
-       
       </div>
     </div>
   </div>
@@ -978,26 +1009,6 @@ ${careHTML}
     </div>
 
     <!-- Mini Profile -->
-    <div class="fs-stat-card">
-      <div class="fs-stat-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="14" width="4" height="7" rx="1"/><rect x="10" y="9" width="4" height="12" rx="1"/><rect x="17" y="4" width="4" height="17" rx="1"/></svg>
-      </div>
-      <div class="fs-stat-content">
-        <div class="fs-stat-top"><span class="fs-stat-number">30</span><span class="fs-stat-label">Day Returns</span></div>
-        <p class="fs-stat-sub">Hassle-free, no questions asked</p>
-      </div>
-    </div>
-
-    <!-- 50K+ Flags Sold -->
-    <div class="fs-stat-card">
-      <div class="fs-stat-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      </div>
-      <div class="fs-stat-content">
-        <div class="fs-stat-top"><span class="fs-stat-number"></span><span class="fs-stat-label"></span></div>
-        <p class="fs-stat-sub">Against manufacturing defects</p>
-      </div>
-    </div>
 
     <!-- 97% Recommend -->
     <div class="fs-stat-card">
@@ -1113,44 +1124,161 @@ async function pushToWoo(){
   document.getElementById('bpush').disabled=false;
 }
 
-async function bulkFix(){
-  const searchText = document.getElementById('bulk-search').value.trim();
-  const page       = parseInt(document.getElementById('bulk-page').value)||1;
-  const perPage    = parseInt(document.getElementById('bulk-perpage').value)||100;
-  const log        = document.getElementById('bulk-log');
-  const btn        = document.getElementById('bbulk');
+// ── Bulk Run ──────────────────────────────────────────────────────────
+let bulkRunning = false;
+let bulkStop    = false;
 
-  if(!searchText){alert('Enter text to search for');return;}
+function bulkLog(msg, type){
+  const el  = document.getElementById('bulk-log-content');
+  const col  = type==='ok'?'#4ade80':type==='err'?'#f87171':type==='skip'?'#94a3b8':'#e2e8f0';
+  const time = new Date().toLocaleTimeString();
+  el.innerHTML += `<span style="color:#64748b">[${time}]</span> <span style="color:${col}">${msg}</span>\n`;
+  el.parentElement.scrollTop = el.parentElement.scrollHeight;
+}
 
-  log.style.display='block';
-  log.innerHTML='&#9203; Fetching products from WooCommerce (page '+page+', '+perPage+' per page)...';
-  btn.disabled=true;
+function stopBulkRun(){
+  bulkStop = true;
+  bulkLog('⏹ Stop requested — finishing current product...','skip');
+  document.getElementById('btn-bulk-stop').style.display='none';
+}
 
-  try{
-    const res = await fetch('/bulk-fix',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({search_text:searchText, page, per_page:perPage})
-    });
-    const d = await res.json();
+async function startBulkRun(){
+  if(!prods.length){alert('Load an Excel file first.');return;}
 
-    if(d.error){
-      log.innerHTML='<span style="color:var(--re)">&#10007; '+d.error+'</span>';
-    } else {
-      let html='<strong>Done: '+d.updated+' updated, '+d.skipped+' skipped, '+d.failed+' failed</strong><br><br>';
-      if(d.details&&d.details.length){
-        d.details.forEach(r=>{
-          const icon = r.status==='updated'?'&#10003;':r.status==='skipped'?'&#8212;':'&#10007;';
-          const col  = r.status==='updated'?'#065f46':r.status==='skipped'?'#6b7280':'#dc2626';
-          html+=`<span style="color:${col}">${icon} #${r.id} ${r.name} — ${r.status}</span><br>`;
-        });
-      }
-      log.innerHTML=html;
+  const startRow  = Math.max(1, parseInt(document.getElementById('bulk-start').value)||1) - 1;
+  const endRow    = parseInt(document.getElementById('bulk-end').value)||0;
+  const delay     = parseInt(document.getElementById('bulk-delay').value)||1000;
+  const subset    = endRow>0 ? prods.slice(startRow, endRow) : prods.slice(startRow);
+
+  if(!subset.length){alert('No products in that range.');return;}
+
+  bulkStop    = false;
+  bulkRunning = true;
+  document.getElementById('btn-bulk-run').disabled = true;
+  document.getElementById('btn-bulk-stop').style.display = 'inline-block';
+  document.getElementById('bulk-progress').style.display = 'block';
+  document.getElementById('bulk-log-wrap').style.display = 'block';
+  document.getElementById('bulk-log-content').innerHTML  = '';
+
+  let done=0, skipped=0, failed=0;
+  const total = subset.length;
+  const startTime = Date.now();
+
+  bulkLog(`▶ Starting bulk run — ${total} products`, 'info');
+
+  for(let i=0; i<subset.length; i++){
+    if(bulkStop) break;
+
+    const p = subset[i];
+    const title = (p['Title']||'').substring(0,50);
+    const sku   = p['Part no/SKU']||'';
+    const url   = p['URL']||'';
+
+    // Progress
+    const pct = Math.round((i/total)*100);
+    document.getElementById('bulk-bar').style.width = pct+'%';
+    document.getElementById('bulk-progress-text').textContent = `${i+1} / ${total}`;
+    document.getElementById('bulk-current').textContent = `Processing: ${title}`;
+
+    // ETA
+    if(i>0){
+      const elapsed = (Date.now()-startTime)/1000;
+      const eta = Math.round((elapsed/i)*(total-i));
+      document.getElementById('bulk-eta').textContent = `ETA: ${eta}s`;
     }
-  }catch(e){
-    log.innerHTML='<span style="color:var(--re)">&#10007; '+e.message+'</span>';
+
+    bulkLog(`[${i+1}/${total}] ${sku} — ${title}`, 'info');
+
+    // 1. Get WooCommerce product ID from URL slug
+    if(!url){bulkLog('  ✗ No URL — skipped','err');skipped++;continue;}
+    const slug = url.replace(/\/$/,'').split('/').pop();
+
+    let pid = null;
+    try{
+      const idRes = await fetch('/woo-id-lookup?slug='+encodeURIComponent(slug));
+      const idData = await idRes.json();
+      pid = idData.id;
+    }catch(e){
+      bulkLog('  ✗ ID lookup failed: '+e.message,'err');
+      failed++;
+      continue;
+    }
+
+    if(!pid){
+      bulkLog('  ✗ Product not found in WooCommerce','err');
+      failed++;
+      continue;
+    }
+    bulkLog(`  ✓ Found Product ID: #${pid}`,'ok');
+
+    // 2. Select product to populate menus
+    const prodIdx = prods.indexOf(p);
+    document.getElementById('psel').value = prodIdx;
+    renderMenus(p);
+    await new Promise(r=>setTimeout(r,100));
+
+    // 3. Build HTML (same as clicking Build button)
+    buildHTML();
+    await new Promise(r=>setTimeout(r,100));
+
+    if(!bHTML){bulkLog('  ✗ HTML build failed','err');failed++;continue;}
+
+    // 4. Push to WooCommerce
+    try{
+      const pushTitle = p['Title']||'';
+      const pushSku   = p['Part no/SKU']||'';
+      const pushPrice = String(p['Price']||'');
+
+      // SEO fields
+      const seoRaw = p['SEO Title and Description']||'';
+      const seoTitle = (seoRaw.match(/SEO Title:\s*(.+?)(?:\n|$)/i)||[])[1]||'';
+      const seoMeta  = (seoRaw.match(/Meta Description:\s*(.+?)(?:\n|$)/i)||[])[1]||'';
+      const seoKw    = p['Focus Keyword']||'';
+
+      const payload = {
+        product_id: pid,
+        description: bHTML,
+        short_description: bShort
+      };
+      if(pushTitle) payload.name = pushTitle;
+      if(pushSku)   payload.sku  = pushSku;
+      if(pushPrice) payload.regular_price = pushPrice;
+      if(seoTitle||seoMeta||seoKw) payload.seo = {title:seoTitle, description:seoMeta, focus_keyword:seoKw};
+
+      const res  = await fetch('/woo-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const data = await res.json();
+
+      if(res.ok){
+        bulkLog(`  ✓ Pushed successfully — ${data.name||title}`,'ok');
+        done++;
+      } else {
+        bulkLog(`  ✗ Push failed: ${data.message||res.status}`,'err');
+        failed++;
+      }
+    }catch(e){
+      bulkLog('  ✗ Push error: '+e.message,'err');
+      failed++;
+    }
+
+    // Delay between products
+    if(i < subset.length-1 && !bulkStop){
+      await new Promise(r=>setTimeout(r,delay));
+    }
   }
-  btn.disabled=false;
+
+  // Final summary
+  document.getElementById('bulk-bar').style.width='100%';
+  document.getElementById('bulk-progress-text').textContent = `${total} / ${total}`;
+  document.getElementById('bulk-current').textContent = 'Complete';
+  document.getElementById('bulk-eta').textContent = '';
+  document.getElementById('btn-bulk-run').disabled = false;
+  document.getElementById('btn-bulk-stop').style.display = 'none';
+  bulkRunning = false;
+
+  bulkLog('','info');
+  bulkLog(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,'info');
+  bulkLog(`✓ Done: ${done}   ✗ Failed: ${failed}   — Skipped: ${skipped}`,'ok');
+  bulkLog(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,'info');
 }
 
 function setSt(t,tx){const el=document.getElementById('stat');el.className='bdg bdg-'+(t==='ready'?'ready':'idle');el.textContent=tx}

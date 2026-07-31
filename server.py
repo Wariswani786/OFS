@@ -84,8 +84,8 @@ class Handler(SimpleHTTPRequestHandler):
 
         if self.path == "/woo-update":
             self._woo_update(body)
-        elif self.path == "/bulk-fix":
-            self._bulk_fix(body)
+        elif self.path.startswith("/woo-id-lookup"):
+            self._woo_id_lookup()
         else:
             self._respond(404, b'{"error":"not found"}')
 
@@ -263,6 +263,29 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception as e:
             import traceback; traceback.print_exc()
             self._respond(500, json.dumps({"error": str(e)}).encode())
+
+    def _woo_id_lookup(self):
+        from urllib.parse import urlparse, parse_qs
+        qs   = parse_qs(urlparse(self.path).query)
+        slug = qs.get("slug", [""])[0]
+        if not slug:
+            self._respond(400, json.dumps({"error": "slug required"}).encode())
+            return
+        try:
+            creds = base64.b64encode(f"{WC_CONSUMER_KEY}:{WC_CONSUMER_SECRET}".encode()).decode()
+            url   = f"https://{WC_HOST}/wp-json/wc/v3/products?slug={slug}&per_page=1"
+            req   = urllib.request.Request(url, headers={
+                "Authorization": f"Basic {creds}",
+                "User-Agent": "Mozilla/5.0"
+            })
+            with urllib.request.urlopen(req, context=ssl_ctx) as r:
+                data = json.loads(decompress(r.read(), r.headers.get("Content-Encoding","").lower()))
+            if data:
+                self._respond(200, json.dumps({"id": data[0]["id"], "name": data[0].get("name","")}).encode())
+            else:
+                self._respond(200, json.dumps({"id": None}).encode())
+        except Exception as e:
+            self._respond(200, json.dumps({"id": None, "error": str(e)}).encode())
 
     def _priority_lookup(self):
         qs  = parse_qs(urlparse(self.path).query)
