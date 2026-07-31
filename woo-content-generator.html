@@ -274,26 +274,17 @@ function onSelect(){
   document.getElementById('bbuild').disabled=false;
   if(p['Part no/SKU'])document.getElementById('psku').value=p['Part no/SKU'];
   renderMenus(p);
-  // Auto-lookup product ID from URL slug
-  const productUrl = p['URL']||'';
-  if(productUrl){
-    const slug = productUrl.replace(/\/$/,'').split('/').pop();
-    if(slug){
-      document.getElementById('wid').value='';
-      document.getElementById('wid').placeholder='Looking up ID for: '+slug.substring(0,30)+'...';
-      fetch('/woo-id-lookup?slug='+encodeURIComponent(slug))
-        .then(r=>r.json())
-        .then(d=>{
-          if(d.id){
-            document.getElementById('wid').value=d.id;
-            document.getElementById('wid').placeholder='e.g. 1042';
-          } else {
-            document.getElementById('wid').placeholder='Not found — enter manually';
-          }
-        })
-        .catch(()=>{ document.getElementById('wid').placeholder='Lookup failed — enter manually'; });
-    }
+  // Use Product ID directly from Excel
+  const productId = (p['Product ID'] || '').toString().trim();
+  if (productId) {
+      document.getElementById('wid').value = productId;
+      document.getElementById('wid').placeholder = 'e.g. 1042';
+  } else {
+      document.getElementById('wid').value = '';
+      document.getElementById('wid').placeholder = 'Product ID missing in Excel';
   }
+  // Auto-lookup product ID from URL slug
+
 }
 
 function xe(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
