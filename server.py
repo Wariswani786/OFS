@@ -84,6 +84,8 @@ class Handler(SimpleHTTPRequestHandler):
 
         if self.path == "/woo-update":
             self._woo_update(body)
+        elif self.path == "/bulk-fix":
+            self._bulk_fix(body)
         else:
             self._respond(404, b'{"error":"not found"}')
 
@@ -180,6 +182,84 @@ class Handler(SimpleHTTPRequestHandler):
             raw = decompress(e.read(), e.headers.get("Content-Encoding", "").lower())
             print(f"  HTTP Error {e.code}: {raw[:200]}")
             self._respond(e.code, raw)
+        except Exception as e:
+            import traceback; traceback.print_exc()
+            self._respond(500, json.dumps({"error": str(e)}).encode())
+
+    def _bulk_fix(self, body):
+        try:
+            payload     = json.loads(body)
+            search_text = payload.get("search_text", "")
+            page        = payload.get("page", 1)
+            per_page    = min(payload.get("per_page", 100), 100)
+
+            if not search_text:
+                self._respond(400, json.dumps({"error": "search_text required"}).encode())
+                return
+
+            creds = base64.b64encode(f"{WC_CONSUMER_KEY}:{WC_CONSUMER_SECRET}".encode()).decode()
+
+            # 1. Fetch products
+            list_url = f"https://{WC_HOST}/wp-json/wc/v3/products?page={page}&per_page={per_page}&status=publish"
+            list_req = urllib.request.Request(list_url, headers={
+                "Authorization": f"Basic {creds}",
+                "User-Agent": "Mozilla/5.0"
+            })
+            with urllib.request.urlopen(list_req, context=ssl_ctx) as r:
+                raw = decompress(r.read(), r.headers.get("Content-Encoding","").lower())
+            products = json.loads(raw)
+
+            print(f"  Bulk fix: {len(products)} products, removing '{search_text}'")
+
+            results = {"updated": 0, "skipped": 0, "failed": 0, "details": []}
+
+            for p in products:
+                pid   = p.get("id")
+                name  = (p.get("name",""))[:50]
+                desc  = p.get("description","")
+
+                if search_text not in desc:
+                    results["skipped"] += 1
+                    results["details"].append({"id": pid, "name": name, "status": "skipped"})
+                    continue
+
+                # Remove the entire stat card div containing search_text
+                # Match <div class="fs-stat-card...">...</div> containing the search text
+                new_desc = re.sub(
+                    r'<div class="fs-stat-card[^"]*">\s*<div class="fs-stat-icon">.*?</div>\s*<div class="fs-stat-content">.*?' + re.escape(search_text) + r'.*?</div>\s*</div>\s*</div>',
+                    '',
+                    desc,
+                    flags=re.DOTALL
+                )
+
+                if new_desc == desc:
+                    # Fallback: just remove the text and surrounding paragraph
+                    new_desc = re.sub(
+                        r'<[^>]+>' + re.escape(search_text) + r'</[^>]+>',
+                        '',
+                        desc
+                    )
+
+                try:
+                    upd_data = json.dumps({"description": new_desc}, ensure_ascii=False).encode("utf-8")
+                    upd_req  = urllib.request.Request(
+                        f"https://{WC_HOST}/wp-json/wc/v3/products/{pid}",
+                        data=upd_data,
+                        headers={"Content-Type":"application/json","Authorization":f"Basic {creds}","User-Agent":"Mozilla/5.0"},
+                        method="PUT"
+                    )
+                    with urllib.request.urlopen(upd_req, context=ssl_ctx) as r:
+                        r.read()
+                    print(f"  Updated #{pid} {name}")
+                    results["updated"] += 1
+                    results["details"].append({"id": pid, "name": name, "status": "updated"})
+                except Exception as e:
+                    print(f"  Failed #{pid}: {e}")
+                    results["failed"] += 1
+                    results["details"].append({"id": pid, "name": name, "status": f"failed: {str(e)[:50]}"})
+
+            self._respond(200, json.dumps(results).encode())
+
         except Exception as e:
             import traceback; traceback.print_exc()
             self._respond(500, json.dumps({"error": str(e)}).encode())
