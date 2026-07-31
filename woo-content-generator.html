@@ -143,6 +143,31 @@ select:focus,input:focus{border-color:var(--navy)}
       Push to WooCommerce
     </button>
     <div class="plog" id="plog"></div>
+
+    <!-- Bulk Fix -->
+    <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:10px;">
+      <div class="sec" style="margin-bottom:8px;">Bulk Fix &middot; Remove from All Products</div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px;line-height:1.5;">Remove a stat card from all products in a range. Gets products from WooCommerce and strips the matching HTML.</div>
+      <div class="fld">
+        <label>Search text to remove (e.g. fs-stat-card content)</label>
+        <input type="text" id="bulk-search" placeholder="e.g. 6 Mo. Warranty" value="6 Mo. Warranty">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <div class="fld" style="margin-bottom:0">
+          <label>From page</label>
+          <input type="text" id="bulk-page" value="1" placeholder="1">
+        </div>
+        <div class="fld" style="margin-bottom:0">
+          <label>Per page (max 100)</label>
+          <input type="text" id="bulk-perpage" value="100" placeholder="100">
+        </div>
+      </div>
+      <button onclick="bulkFix()" style="width:100%;padding:9px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:var(--r);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;" id="bbulk">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+        Run Bulk Fix
+      </button>
+      <div id="bulk-log" style="margin-top:8px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:9px 11px;font-size:11px;line-height:1.7;display:none;max-height:200px;overflow-y:auto;"></div>
+    </div>
   </div>
 </div>
 
@@ -808,7 +833,7 @@ ${specHTML}
                 <div class="pd-shipping-icon">
                   <svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>
                 </div>
-               
+                
               </li>
             </ul>
           </div>
@@ -1086,6 +1111,46 @@ async function pushToWoo(){
     setSt('idle','Error');
   }
   document.getElementById('bpush').disabled=false;
+}
+
+async function bulkFix(){
+  const searchText = document.getElementById('bulk-search').value.trim();
+  const page       = parseInt(document.getElementById('bulk-page').value)||1;
+  const perPage    = parseInt(document.getElementById('bulk-perpage').value)||100;
+  const log        = document.getElementById('bulk-log');
+  const btn        = document.getElementById('bbulk');
+
+  if(!searchText){alert('Enter text to search for');return;}
+
+  log.style.display='block';
+  log.innerHTML='&#9203; Fetching products from WooCommerce (page '+page+', '+perPage+' per page)...';
+  btn.disabled=true;
+
+  try{
+    const res = await fetch('/bulk-fix',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({search_text:searchText, page, per_page:perPage})
+    });
+    const d = await res.json();
+
+    if(d.error){
+      log.innerHTML='<span style="color:var(--re)">&#10007; '+d.error+'</span>';
+    } else {
+      let html='<strong>Done: '+d.updated+' updated, '+d.skipped+' skipped, '+d.failed+' failed</strong><br><br>';
+      if(d.details&&d.details.length){
+        d.details.forEach(r=>{
+          const icon = r.status==='updated'?'&#10003;':r.status==='skipped'?'&#8212;':'&#10007;';
+          const col  = r.status==='updated'?'#065f46':r.status==='skipped'?'#6b7280':'#dc2626';
+          html+=`<span style="color:${col}">${icon} #${r.id} ${r.name} — ${r.status}</span><br>`;
+        });
+      }
+      log.innerHTML=html;
+    }
+  }catch(e){
+    log.innerHTML='<span style="color:var(--re)">&#10007; '+e.message+'</span>';
+  }
+  btn.disabled=false;
 }
 
 function setSt(t,tx){const el=document.getElementById('stat');el.className='bdg bdg-'+(t==='ready'?'ready':'idle');el.textContent=tx}
