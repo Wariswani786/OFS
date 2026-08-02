@@ -102,28 +102,30 @@ class Handler(SimpleHTTPRequestHandler):
             print(f"\n  Product   : #{product_id}")
             print(f"  HTML size : {len(description)} chars")
 
-            # ── Split Widget 2 into its own WPBakery row with dark background ──
-            w2_match = re.search(
-                r'(<!-- Widget 2:.*?</div>)\s*<div style="height:40px"></div>\s*(<!-- Widget 1:.*)',
-                description, re.DOTALL
+            # ── Split into per-widget vc_raw_html blocks ──────────────────────────
+            # Each widget gets its own WPBakery row — matches manual structure
+            widget_pattern = re.compile(
+                r'(<!-- Widget [\d]+[ab]?:.*?)(?=<!-- Widget [\d]+[ab]?:|\Z)',
+                re.DOTALL
             )
+            widgets = [m.group(1).strip() for m in widget_pattern.finditer(description)]
+            print(f"  Widgets found: {len(widgets)}")
 
-            if w2_match:
-                widget2_html = w2_match.group(1).strip()
-                rest_html    = w2_match.group(2).strip()
-                enc_w2   = base64.b64encode(widget2_html.encode("utf-8")).decode("utf-8")
-                enc_rest = base64.b64encode(rest_html.encode("utf-8")).decode("utf-8")
-                rand_id  = str(abs(hash(widget2_html)) % 99999)
-                wpb_content = (
-                    f'[vc_row css=".vc_custom_{rand_id}{{background-color: #0A1F3F !important;}}"]'
-                    f'[vc_column][vc_raw_html]{enc_w2}[/vc_raw_html][/vc_column][/vc_row]'
-                    f'[vc_row][vc_column][vc_raw_html]{enc_rest}[/vc_raw_html][/vc_column][/vc_row]'
-                )
-                print("  WPBakery  : W2 dark row + content row")
+            if len(widgets) >= 2:
+                wpb_content = ''
+                rand_id = str(abs(hash(description[:100])) % 99999)
+                for widget_html in widgets:
+                    enc_w = base64.b64encode(widget_html.encode("utf-8")).decode("utf-8")
+                    if '<!-- Widget 2:' in widget_html[:60]:
+                        # Widget 2 gets dark background on its row
+                        wpb_content += f'[vc_row css=".vc_custom_{rand_id}{{background-color: #0A1F3F !important;}}"][vc_column][vc_raw_html]{enc_w}[/vc_raw_html][/vc_column][/vc_row]'
+                    else:
+                        wpb_content += f'[vc_row][vc_column][vc_raw_html]{enc_w}[/vc_raw_html][/vc_column][/vc_row]'
+                print(f"  WPBakery  : {len(widgets)} widget rows")
             else:
                 enc = base64.b64encode(description.encode("utf-8")).decode("utf-8")
                 wpb_content = f'[vc_row][vc_column][vc_raw_html]{enc}[/vc_raw_html][/vc_column][/vc_row]'
-                print("  WPBakery  : single block")
+                print(f"  WPBakery  : single block")
 
             # ── Build WooCommerce payload ──────────────────────────────────────
             send_payload = {
