@@ -627,13 +627,15 @@ function buildHTML(){
 <div class="flag-features-section" style="background-color:#0A1F3F !important;">
   <div class="flag-features-header">
     <div class="ff-accent">* ${accent}</div>
-    <h2>${w2heading}</h2>
-    <p>${w2subtext}</p>
+    <h2>${w2h}</h2>
+    <p>${w2s}</p>
   </div>
   <div class="flag-features-grid">
 ${w2items}
   </div>
 </div>
+
+<div style="height:40px;"></div>
 
 <!-- Widget 1: Product Page Layout -->
 <style>
@@ -688,12 +690,12 @@ ${w2items}
   <div class="pp-col-left">
     <div class="pdesc-badge">* <span>${badge}</span> &nbsp;&middot;&nbsp; About This Product</div>
     <h2 class="pdesc-heading">${heading}</h2>
-    <p class="pdesc-text">${descText}</p>
+    <p class="pdesc-text">${desc}</p>
     <div class="pdesc-feature-grid">
-${featureCards}
+${fCards}
     </div>
     <ul class="pdesc-checklist">
-${checkItems}
+${chkl}
     </ul>
   </div>
   <div class="pp-col-right">
@@ -704,7 +706,7 @@ ${checkItems}
           <svg class="pd-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
         </button>
         <div class="pd-body"><div class="pd-content">
-          <table class="pd-spec-table">${specRows}</table>
+          <table class="pd-spec-table">${specHTML}</table>
         </div></div>
       </div>
       <div class="pd-item">
@@ -771,7 +773,7 @@ ${checkItems}
     <h2 class="fd-heading">The Difference is in the Details</h2>
     <table class="fd-table">
       <thead><tr><th>Feature</th><th>Our Flag</th><th>Typical Flag</th></tr></thead>
-      <tbody>${compareRows}</tbody>
+      <tbody>${cmpRows}</tbody>
     </table>
     <div class="fd-badges">
       <div class="fd-badge">
@@ -783,7 +785,7 @@ ${checkItems}
   <div class="fd-right">
     <h3 class="fd-care-title">Care &amp; Maintenance</h3>
     <p class="fd-care-sub">Keep your product looking its best</p>
-    <ul class="fd-care-list">${careItems}</ul>
+    <ul class="fd-care-list">${careHTML}</ul>
   </div>
 </div>
 
