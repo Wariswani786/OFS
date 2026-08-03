@@ -103,8 +103,29 @@ class Handler(SimpleHTTPRequestHandler):
             print(f"  HTML size : {len(description)} chars")
 
 
-            # Send raw HTML directly
-            wpb_content = description
+            # Encode into WPBakery vc_raw_html shortcode (base64)
+            import re as _re
+            # Split Widget 2 (dark bg) into its own row, rest into another
+            w2_match = _re.search(
+                r'(<!-- Widget 2:.*?</div>\s*<div style="height:40px;"></div>)(\s*<!-- Widget 1:.*)',
+                description, _re.DOTALL
+            )
+            if w2_match:
+                w2_html   = w2_match.group(1).strip()
+                rest_html = w2_match.group(2).strip()
+                enc_w2    = base64.b64encode(w2_html.encode('utf-8')).decode('utf-8')
+                enc_rest  = base64.b64encode(rest_html.encode('utf-8')).decode('utf-8')
+                rand_id   = str(abs(hash(w2_html)) % 99999)
+                wpb_content = (
+                    f'[vc_row css=".vc_custom_{rand_id}{{background-color: #0A1F3F !important;}}"]'
+                    f'[vc_column][vc_raw_html]{enc_w2}[/vc_raw_html][/vc_column][/vc_row]'
+                    f'[vc_row][vc_column][vc_raw_html]{enc_rest}[/vc_raw_html][/vc_column][/vc_row]'
+                )
+                print(f"  WPBakery  : W2 dark row + content row")
+            else:
+                enc = base64.b64encode(description.encode('utf-8')).decode('utf-8')
+                wpb_content = f'[vc_row][vc_column][vc_raw_html]{enc}[/vc_raw_html][/vc_column][/vc_row]'
+                print(f"  WPBakery  : single block ({len(description)} chars)")
 
             # ── Build WooCommerce payload ──────────────────────────────────────
             send_payload = {
