@@ -486,7 +486,7 @@ function buildHTML(){
   const rawHeading=g('d-sheading');
   // Short heading: strip PromoPatriot + take part before first dash
   const fullHeading=title.replace(/^PromoPatriot\s+/i,'');
-  const heading=rawHeading||fullHeading.split(' - ')[0].split('  ')[0].trim();
+  const heading=rawHeading||fullHeading.split(/\s+[-–—]\s+/)[0].trim();
 
   bShort=tags;
 
