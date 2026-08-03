@@ -102,30 +102,9 @@ class Handler(SimpleHTTPRequestHandler):
             print(f"\n  Product   : #{product_id}")
             print(f"  HTML size : {len(description)} chars")
 
-            # ── Split into per-widget vc_raw_html blocks ──────────────────────────
-            # Each widget gets its own WPBakery row — matches manual structure
-            widget_pattern = re.compile(
-                r'(<!-- Widget [\d]+[ab]?:.*?)(?=<!-- Widget [\d]+[ab]?:|\Z)',
-                re.DOTALL
-            )
-            widgets = [m.group(1).strip() for m in widget_pattern.finditer(description)]
-            print(f"  Widgets found: {len(widgets)}")
 
-            if len(widgets) >= 2:
-                wpb_content = ''
-                rand_id = str(abs(hash(description[:100])) % 99999)
-                for widget_html in widgets:
-                    enc_w = base64.b64encode(widget_html.encode("utf-8")).decode("utf-8")
-                    if '<!-- Widget 2:' in widget_html[:60]:
-                        # Widget 2 gets dark background on its row
-                        wpb_content += f'[vc_row css=".vc_custom_{rand_id}{{background-color: #0A1F3F !important;}}"][vc_column][vc_raw_html]{enc_w}[/vc_raw_html][/vc_column][/vc_row]'
-                    else:
-                        wpb_content += f'[vc_row][vc_column][vc_raw_html]{enc_w}[/vc_raw_html][/vc_column][/vc_row]'
-                print(f"  WPBakery  : {len(widgets)} widget rows")
-            else:
-                enc = base64.b64encode(description.encode("utf-8")).decode("utf-8")
-                wpb_content = f'[vc_row][vc_column][vc_raw_html]{enc}[/vc_raw_html][/vc_column][/vc_row]'
-                print(f"  WPBakery  : single block")
+            # Send raw HTML directly
+            wpb_content = description
 
             # ── Build WooCommerce payload ──────────────────────────────────────
             send_payload = {

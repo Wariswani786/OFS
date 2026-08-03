@@ -219,7 +219,7 @@ select:focus,input:focus{border-color:var(--navy)}
 <script>
 let prods=[],bHTML="",bShort="";
 
-// ── Priority Lookup ────────────────────────────────────────────────────
+//  Priority Lookup 
 async function lookupP(){
   const sku=document.getElementById('psku').value.trim();
   if(!sku){alert('Enter a SKU');return;}
@@ -239,7 +239,7 @@ async function lookupP(){
   btn.disabled=false;
 }
 
-// ── Excel ──────────────────────────────────────────────────────────────
+//  Excel 
 function onDrag(e,ov){e.preventDefault();document.getElementById('dz').classList.toggle('ov',ov)}
 function onDrop(e){e.preventDefault();onDrag(e,false);if(e.dataTransfer.files[0])loadXL(e.dataTransfer.files[0])}
 function onFile(e){if(e.target.files[0])loadXL(e.target.files[0])}
@@ -287,7 +287,7 @@ function onSelect(){
 
 function xe(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-// ── Parse B columns ────────────────────────────────────────────────────
+//  Parse B columns 
 // Format: "CardLabel:\n ChecklistLabel- Description"
 function parseB(v){
   v=(v||'').trim();if(!v)return null;
@@ -359,7 +359,7 @@ function parseFAQs(raw){
   return items;
 }
 
-// ── Spec rows: editable in menu, auto-detected as fallback
+//  Spec rows: editable in menu, auto-detected as fallback
 function buildSpecs(title,sku){
   const rows=[],tl=title.toLowerCase();
   const shortTitle=title.replace(/^PromoPatriot\s+/i,'');
@@ -399,7 +399,7 @@ function buildSpecs(title,sku){
   return rows;
 }
 
-// ── Render Menus ──────────────────────────────────────────────────────
+//  Render Menus 
 function renderMenus(p){
   const ft=parseFeatures(p),cr=parseCompare(p['Comparison Table']||''),ca=parseCare(p['Care and Maintenance']||''),fq=parseFAQs(p['FAQs']||'');
   window._fc=ft.length;window._cc=cr.length;window._kc=ca.length;window._qc=fq.length;
@@ -416,14 +416,14 @@ function renderMenus(p){
     {id:'basic',icon:'&#x1F4CB;',title:'Basic Info',
      body:'<div class="mf"><label>Title</label><input type="text" id="d-title" value="'+xe(p['Title']||'')+'"></div>'+
           '<div class="mf"><label>Description</label><textarea id="d-desc" rows="4">'+xe(p['Description and others']||'')+'</textarea></div>'+
-          '<div class="mf"><label>Badge text (pill — auto from title if blank)</label><input type="text" id="d-badge" placeholder="e.g. DESK READY SET"></div>'+
+          '<div class="mf"><label>Badge text (pill -- auto from title if blank)</label><input type="text" id="d-badge" placeholder="e.g. DESK READY SET"></div>'+
           '<div class="mf"><label>W2 Accent line</label><input type="text" id="d-accent" value="'+xe(defaultAccent)+'"></div>'+
           '<div class="mf"><label>W2 Heading</label><input type="text" id="d-w2h" value="'+xe(defaultW2H)+'"></div>'+
           '<div class="mf"><label>W2 Subtext</label><input type="text" id="d-w2s" value="'+xe(defaultW2S)+'"></div>'+
           '<div class="mf"><label>Short Heading (e.g. Printed Polyester California State Flag)</label><input type="text" id="d-sheading" value=""></div>'+
           '<div class="mf"><label>SKU</label><input type="text" id="d-sku" value="'+xe(p['Part no/SKU']||'')+'" style="margin-bottom:3px"></div>'+
           '<div class="mf"><label>Price ($)</label><input type="text" id="d-price" value="'+xe(p['Price']||'')+'" style="margin-bottom:3px"></div>'+
-          '<div class="mf"><label>Weight (lbs — for shipping)</label><input type="text" id="d-weight" value=""></div>'+
+          '<div class="mf"><label>Weight (lbs -- for shipping)</label><input type="text" id="d-weight" value=""></div>'+
           '<div class="mf"><label>SEO Title</label><input type="text" id="d-seo-title" value="'+xe((function(){var s=p['SEO Title and Description']||'';var m=s.match(/SEO Title:\s*(.+?)(?:\n|$)/i);return m?m[1].trim():'';})())+'"></div>'+
           '<div class="mf"><label>Meta Description</label><textarea id="d-seo-meta" rows="2" placeholder="Pull from SEO Title and Description column">'+xe((p['SEO Title and Description']||'').replace(/.*Meta Description:\s*/is,'').trim())+'</textarea></div>'+
           '<div class="mf"><label>Focus Keyword</label><input type="text" id="d-seo-kw" value="'+xe(p['Focus Keyword']||'')+'"></div>'+
@@ -466,7 +466,7 @@ function renderMenus(p){
 function togMenu(id){const b=document.getElementById('mb-'+id),c=document.getElementById('ch-'+id);const op=b.classList.toggle('op');c.innerHTML=op?'&#x25B2;':'&#x25BC;'}
 function g(id){const el=document.getElementById(id);return el?el.value.trim():''}
 
-// ── Build HTML ─────────────────────────────────────────────────────────
+//  Build HTML 
 function buildHTML(){
   const title=g('d-title'),desc=g('d-desc'),sku=g('d-sku'),tags=g('d-tags');
   const accent=g('d-accent')||'About This Product';
@@ -486,7 +486,7 @@ function buildHTML(){
   const rawHeading=g('d-sheading');
   // Short heading: strip PromoPatriot + take part before first dash
   const fullHeading=title.replace(/^PromoPatriot\s+/i,'');
-  const heading=rawHeading||fullHeading.split(' - ')[0].split(' – ')[0].trim();
+  const heading=rawHeading||fullHeading.split(' - ')[0].split('  ')[0].trim();
 
   bShort=tags;
 
@@ -497,7 +497,7 @@ function buildHTML(){
 
   const specs=buildSpecs(title,sku);
 
-  // ── SVG icons for feature cards (Widget 1 — 3 shown from first 3 B cols)
+  //  SVG icons for feature cards (Widget 1 -- 3 shown from first 3 B cols)
   // Matching exact SVGs from the PDF
   const card_svgs=[
     // Office & Desk (rect + lines)
@@ -508,23 +508,23 @@ function buildHTML(){
     `<svg class="pdesc-feature-icon" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>`,
   ];
 
-  // ── SVG icons for Widget 2 features (6 items cycling)
+  //  SVG icons for Widget 2 features (6 items cycling)
   const w2svgs=[
-    // Miniature size — small flag/rect
+    // Miniature size -- small flag/rect
     `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><rect x="12" y="14" width="24" height="16" rx="2" stroke-linejoin="round"/><line x1="12" y1="20" x2="36" y2="20"/></svg>`,
-    // Base included — pole with base (hero)
+    // Base included -- pole with base (hero)
     `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><ellipse cx="24" cy="38" rx="14" ry="4" stroke-width="2"/><line x1="24" y1="10" x2="24" y2="38" stroke-width="2.5"/><circle cx="24" cy="8" r="3" fill="rgba(245,158,11,0.8)"/></svg>`,
-    // Polyester — fabric grid
+    // Polyester -- fabric grid
     `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><rect x="10" y="10" width="28" height="28" rx="2" stroke-linejoin="round"/><path d="M10 18 L38 18" stroke-linecap="round"/><path d="M10 24 L38 24" stroke-linecap="round"/></svg>`,
-    // Bear print — circle target
+    // Bear print -- circle target
     `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="14" stroke-dasharray="3 3"/><circle cx="24" cy="24" r="8"/></svg>`,
-    // Gold ball finial — pole+ball
+    // Gold ball finial -- pole+ball
     `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="12" r="6" fill="rgba(245,158,11,0.8)"/><line x1="24" y1="18" x2="24" y2="40" stroke-width="2.5"/></svg>`,
-    // Heat sealed edges — triangle
+    // Heat sealed edges -- triangle
     `<svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path d="M10 38 L24 10 L38 38" stroke-linejoin="round" stroke-linecap="round"/><path d="M16 28 L32 28" stroke-linecap="round"/><path d="M8 40 L40 40" stroke-linecap="round" stroke-width="2.5"/></svg>`
   ];
 
-  // ── Care SVG icons
+  //  Care SVG icons
   const careSvgs=[
     `<svg viewBox="0 0 24 24"><rect x="4" y="9" width="16" height="11" rx="2"/><circle cx="12" cy="15" r="3"/></svg>`,
     `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>`,
@@ -535,7 +535,7 @@ function buildHTML(){
   ];
 
   // Build HTML blocks
-  // Feature cards — first 3 B columns, card label only
+  // Feature cards -- first 3 B columns, card label only
   const fCards=ft.slice(0,3).map((f,i)=>`      <div class="pdesc-feature-card">
         <div class="pdesc-feature-icon-wrap">
           ${card_svgs[i]||card_svgs[0]}
@@ -543,16 +543,16 @@ function buildHTML(){
         <div class="pdesc-feature-label">${f.cardLabel}</div>
       </div>`).join('\n');
 
-  // Checklist — all B columns, bold chkLabel + desc
+  // Checklist -- all B columns, bold chkLabel + desc
   const chkl=ft.map(f=>`      <li class="pdesc-check-item">
-        <span class="pdesc-check-mark">&#10003;</span>
+        <span class="pdesc-check-mark">OK</span>
         <span class="pdesc-check-text"><strong>${f.chkLabel}</strong> \u2014 ${f.desc}</span>
       </li>`).join('\n');
 
   // Spec rows
   const specHTML=specs.map(([l,v])=>`              <tr><td>${l}</td><td>${v}</td></tr>`).join('\n');
 
-  // Widget 2 items — all B columns with unique SVGs
+  // Widget 2 items -- all B columns with unique SVGs
   const w2items=ft.map((f,i)=>`
     <!-- ${f.cardLabel} -->
     <div class="flag-feature-item">
@@ -564,7 +564,7 @@ function buildHTML(){
       <p class="flag-feature-desc">${f.desc}</p>
     </div>`).join('\n');
 
-  // Comparison rows — fd-our-flag-gold for rows that contain stars/highlights
+  // Comparison rows -- fd-our-flag-gold for rows that contain stars/highlights
   // Looking at PDF: row 0 (Included/Package) = gold, row 4 (Display) = gold
   const cmpRows=cr.map((r,i)=>{
     const isGold=i===0||r.ours.includes('\u2605');
@@ -598,12 +598,12 @@ function buildHTML(){
       </div>
     </div>`).join('\n');
 
-  // ════════════════════════════════════════════════════
-  // FINAL HTML — exactly matching the PDF/WPBakery structure
+  // 
+  // FINAL HTML -- exactly matching the PDF/WPBakery structure
   // Widget 2 FIRST (dark), then Widget 1, then 3, then 4a, then 4b
-  // ════════════════════════════════════════════════════
+  // 
   bHTML=
-`
+`<!-- Widget 2: Flag Features Section -->
 <style>
   .flag-features-section { background-color: #0A1F3F; padding: 40px 10px; font-family: Inter, Arial, sans-serif; box-sizing: border-box; width: 100%; }
   .flag-features-section * { box-sizing: border-box; }
@@ -615,205 +615,238 @@ function buildHTML(){
   .flag-feature-item { flex: 1 1 160px; max-width: 200px; text-align: center; padding: 10px; }
   .flag-feature-icon { width: 90px; height: 90px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.25); margin: 0 auto 18px auto; display: flex; align-items: center; justify-content: center; transition: border-color 0.3s ease, transform 0.3s ease; }
   .flag-feature-icon svg { width: 38px; height: 38px; stroke: rgba(255,255,255,0.5); fill: none; stroke-width: 1.5; transition: stroke 0.3s ease; }
+  .flag-feature-item.ff-hero .flag-feature-icon { border-color: rgba(245,158,11,0.6); }
+  .flag-feature-item.ff-hero .flag-feature-icon svg { stroke: rgba(245,158,11,0.8); }
   .flag-feature-item:hover .flag-feature-icon { border-color: rgba(255,255,255,0.6); transform: translateY(-4px); }
   .flag-feature-item:hover .flag-feature-icon svg { stroke: rgba(255,255,255,0.9); }
   .flag-feature-title { color: #ffffff; font-size: 14px; font-weight: 700; margin: 0 0 10px 0; font-family: Inter, Arial, sans-serif; letter-spacing: 0.3px; }
   .flag-feature-desc { color: #8fa3bc; font-size: 12.5px; line-height: 1.65; margin: 0; font-family: Inter, Arial, sans-serif; }
+  .ff-tag { display: inline-block; background: #f59e0b; color: #0A1F3F; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; margin-bottom: 6px; font-family: Inter, Arial, sans-serif; }
   @media (max-width: 600px) { .flag-features-section { padding: 40px 20px; } .flag-feature-item { flex: 1 1 140px; max-width: 160px; } .flag-features-header h2 { font-size: 22px; } }
 </style>
-<!-- Widget 2: Flag Features Section -->
-<!-- PromoPatriot ${title} - Features Section Widget -->
-<div class="flag-features-section" style="background-color:#0A1F3F !important;padding:40px 10px;font-family:Inter,Arial,sans-serif;box-sizing:border-box;width:100%;">
+<div class="flag-features-section" style="background-color:#0A1F3F !important;">
   <div class="flag-features-header">
-    <div class="ff-accent">&#9733; ${accent}</div>
-    <h2>${w2h}</h2>
-    <p>${w2s}</p>
+    <div class="ff-accent">* ${accent}</div>
+    <h2>${w2heading}</h2>
+    <p>${w2subtext}</p>
   </div>
   <div class="flag-features-grid">
 ${w2items}
   </div>
 </div>
 
-<div style="height:40px"></div>
-
-<div style="height:40px"></div>
-
-<!-- Widget 1: Product Page Layout (Description left / Specifications + Shipping & Returns right) -->
-<!-- PromoPatriot ${title} - OnlineFlagStore Widget -->
+<!-- Widget 1: Product Page Layout -->
+<style>
+  .pp-row { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; width: 100%; margin: 0; align-items: start; font-family: Arial, sans-serif; padding: 0 clamp(16px, 4vw, 40px); }
+  .pp-row * { box-sizing: border-box; }
+  .pdesc-badge { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 8px; background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%); color: #fff; font-size: clamp(10.5px, 1.6vw, 11.5px); font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 7px 16px; border-radius: 4px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(10,31,63,0.25); font-family: Arial, sans-serif; }
+  .pdesc-badge span { color: #f59e0b; }
+  .pdesc-heading { font-size: clamp(22px, 4vw, 32px); font-weight: 800; text-transform: uppercase; color: #0A1F3F; margin: 0 0 16px 0; line-height: 1.2; letter-spacing: 0.3px; font-family: Arial, sans-serif; word-wrap: break-word; }
+  .pdesc-heading::after { content: ''; display: block; width: 56px; height: 4px; background: #0A1F3F; border-radius: 2px; margin-top: 14px; }
+  .pdesc-text { font-size: clamp(13.5px, 1.8vw, 14.5px); color: #374151; line-height: 1.75; margin: 20px 0 26px 0; font-family: Arial, sans-serif; }
+  .pdesc-text strong { color: #0A1F3F; }
+  .pdesc-feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 30px 0; }
+  .pdesc-feature-card { border: 1px solid #e5e7eb; background: #fafbfc; border-radius: 8px; padding: 22px 10px; text-align: center; transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease; }
+  .pdesc-feature-card:hover { border-color: #0A1F3F; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(10,31,63,0.1); }
+  .pdesc-feature-icon-wrap { width: 40px; height: 40px; margin: 0 auto 12px; border-radius: 50%; background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pdesc-feature-icon { width: 19px; height: 19px; stroke: #f59e0b; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .pdesc-feature-label { font-size: clamp(10.5px, 1.6vw, 11.5px); font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; color: #0A1F3F; font-family: Arial, sans-serif; }
+  .pdesc-checklist { list-style: none; padding: 0; margin: 0; }
+  .pdesc-check-item { display: flex; gap: 12px; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid #f3f4f6; }
+  .pdesc-check-item:last-child { border-bottom: none; }
+  .pdesc-check-mark { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: #0A1F3F; color: #fff; font-size: 11px; line-height: 20px; text-align: center; margin-top: 1px; }
+  .pdesc-check-text { font-size: clamp(13px, 1.8vw, 14px); color: #374151; line-height: 1.6; font-family: Arial, sans-serif; }
+  .pdesc-check-text strong { color: #0A1F3F; font-weight: 700; }
+  .pd-wrap { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(10,31,63,0.05); }
+  .pd-item { border-top: 1px solid #e5e7eb; background: #fff; }
+  .pd-item:first-child { border-top: none; }
+  .pd-item.open { background: #fafbfc; }
+  .pd-trigger { width: 100%; background: none; border: none; padding: 20px 22px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-align: left; gap: 12px; }
+  .pd-trigger-label { font-size: 15px; font-weight: 700; color: #0A1F3F; font-family: Arial, sans-serif; }
+  .pd-chevron { width: 18px; height: 18px; flex-shrink: 0; stroke: #6b7280; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+  .pd-item.open .pd-chevron { transform: rotate(180deg); stroke: #0A1F3F; }
+  .pd-body { max-height: 0; overflow: hidden; transition: max-height 0.35s ease; }
+  .pd-item.open .pd-body { max-height: 1400px; }
+  .pd-content { padding: 0 22px 24px; }
+  .pd-spec-table { width: 100%; border-collapse: collapse; font-size: 13.5px; font-family: Arial, sans-serif; }
+  .pd-spec-table tr { border-bottom: 1px solid #eef0f2; }
+  .pd-spec-table tr:last-child { border-bottom: none; }
+  .pd-spec-table td { padding: 11px 8px; vertical-align: top; line-height: 1.5; }
+  .pd-spec-table td:first-child { font-weight: 700; color: #0A1F3F; width: 42%; white-space: nowrap; }
+  .pd-spec-table td:last-child { color: #374151; }
+  .pd-shipping-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 18px; }
+  .pd-shipping-item { display: flex; gap: 14px; align-items: flex-start; }
+  .pd-shipping-icon { width: 38px; height: 38px; flex-shrink: 0; background: linear-gradient(135deg, #0A1F3F 0%, #1a3a6e 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .pd-shipping-icon svg { width: 18px; height: 18px; stroke: #f59e0b; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .pd-shipping-label { font-size: 13.5px; font-weight: 700; color: #0A1F3F; margin: 0 0 3px 0; font-family: Arial, sans-serif; }
+  .pd-shipping-text { font-size: 13px; color: #4b5563; margin: 0; line-height: 1.6; font-family: Arial, sans-serif; }
+  @media (max-width: 860px) { .pp-row { grid-template-columns: 1fr; gap: 32px; } }
+  @media (max-width: 640px) { .pp-row { gap: 28px; } .pdesc-feature-grid { grid-template-columns: repeat(2, 1fr); } .pd-trigger { padding: 16px; } .pd-content { padding: 0 16px 20px; } }
+  @media (max-width: 480px) { .pdesc-badge { font-size: 10px; padding: 6px 12px; } .pdesc-feature-grid { grid-template-columns: 1fr; gap: 10px; } .pdesc-feature-card { display: flex; align-items: center; gap: 12px; text-align: left; padding: 14px 16px; } .pdesc-feature-icon-wrap { margin: 0; } .pdesc-check-item { padding: 13px 0; } .pd-spec-table tr { display: flex; flex-direction: column; padding: 8px 0; } .pd-spec-table td { padding: 2px 0; white-space: normal; } .pd-spec-table td:first-child { width: 100%; font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px; } }
+</style>
 <div class="pp-row">
-
-  <!-- LEFT COLUMN: Description -->
   <div class="pp-col-left">
-    <div class="pdesc-badge">&#9733; <span>${badge}</span> &nbsp;&middot;&nbsp; About This Product</div>
-
+    <div class="pdesc-badge">* <span>${badge}</span> &nbsp;&middot;&nbsp; About This Product</div>
     <h2 class="pdesc-heading">${heading}</h2>
-
-    <p class="pdesc-text">${desc}</p>
-
+    <p class="pdesc-text">${descText}</p>
     <div class="pdesc-feature-grid">
-${fCards}
+${featureCards}
     </div>
-
     <ul class="pdesc-checklist">
-${chkl}
+${checkItems}
     </ul>
   </div>
-
-  <!-- RIGHT COLUMN: Specifications / Shipping & Returns -->
   <div class="pp-col-right">
     <div class="pd-wrap">
-
-      <!-- Specifications -->
       <div class="pd-item open">
         <button class="pd-trigger" aria-expanded="true">
           <span class="pd-trigger-label">Specifications</span>
           <svg class="pd-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
         </button>
-        <div class="pd-body">
-          <div class="pd-content">
-            <table class="pd-spec-table">
-${specHTML}
-            </table>
-          </div>
-        </div>
+        <div class="pd-body"><div class="pd-content">
+          <table class="pd-spec-table">${specRows}</table>
+        </div></div>
       </div>
-
-      <!-- Shipping & Returns -->
       <div class="pd-item">
         <button class="pd-trigger" aria-expanded="false">
           <span class="pd-trigger-label">Shipping &amp; Returns</span>
           <svg class="pd-chevron" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
         </button>
-        <div class="pd-body">
-          <div class="pd-content">
-            <ul class="pd-shipping-list">
-              <li class="pd-shipping-item">
-                <div class="pd-shipping-icon">
-                  <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-                </div>
-                <div>
-                  <p class="pd-shipping-label">Free Standard Shipping</p>
-                  <p class="pd-shipping-text">Standard delivery takes 3&ndash;5 business days. Expedited options available at checkout. Orders placed before 2 PM EST ship same day.</p>
-                </div>
-              </li>
-              <li class="pd-shipping-item">
-                <div class="pd-shipping-icon">
-                  <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-                </div>
-                <div>
-                  <p class="pd-shipping-label">30-Day Hassle-Free Returns</p>
-                  <p class="pd-shipping-text">Not 100% satisfied? Return your flag within 30 days for a full refund. Items must be in original, unused condition.</p>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <div class="pd-body"><div class="pd-content">
+          <ul class="pd-shipping-list">
+            <li class="pd-shipping-item">
+              <div class="pd-shipping-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+              <div><p class="pd-shipping-label">Free Standard Shipping</p><p class="pd-shipping-text">Standard delivery 3&ndash;5 business days. Expedited options available at checkout. Orders placed before 2 PM EST ship same day.</p></div>
+            </li>
+            <li class="pd-shipping-item">
+              <div class="pd-shipping-icon"><svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></div>
+              <div><p class="pd-shipping-label">30-Day Hassle-Free Returns</p><p class="pd-shipping-text">Not 100% satisfied? Return within 30 days for a full refund. Items must be in original, unused condition.</p></div>
+            </li>
+          </ul>
+        </div></div>
       </div>
-
     </div>
   </div>
-
 </div>
 
-<div style="height:40px"></div>
-
-<div style="height:40px"></div>
-
 <!-- Widget 3: Why Choose Us + Care & Maintenance -->
-<!-- PromoPatriot ${title} - Comparison & Care Widget -->
+<style>
+  .fd-wrap { font-family: Inter, Arial, sans-serif; display: flex; gap: 30px; max-width: 100%; margin: 0 auto; padding: 40px 20px; box-sizing: border-box; align-items: flex-start; flex-wrap: wrap; }
+  .fd-wrap * { box-sizing: border-box; }
+  .fd-left { flex: 1 1 480px; min-width: 300px; }
+  .fd-eyebrow { color: #0A1F3F; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin: 0 0 10px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-heading { color: #111827; font-size: 28px; font-weight: 700; margin: 0 0 24px 0; line-height: 1.2; font-family: Inter, Arial, sans-serif; }
+  .fd-table { width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; margin-bottom: 24px; }
+  .fd-table thead tr { background-color: #0A1F3F; }
+  .fd-table thead th { color: #ffffff; font-size: 13px; font-weight: 600; padding: 14px 16px; text-align: left; font-family: Inter, Arial, sans-serif; }
+  .fd-table tbody tr { border-bottom: 1px solid #e5e7eb; }
+  .fd-table tbody tr:last-child { border-bottom: none; }
+  .fd-table tbody td { padding: 14px 16px; font-size: 14px; color: #374151; font-family: Inter, Arial, sans-serif; }
+  .fd-table tbody td:first-child { font-weight: 600; color: #111827; }
+  .fd-table tbody tr.fd-highlight-row { background: #fffbf0; }
+  .fd-our-flag { color: #008236; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .fd-our-flag::before { content: '\u2713'; color: #008236; font-weight: 700; }
+  .fd-our-flag-gold { color: #b45309; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+  .fd-our-flag-gold::before { content: '\u2605'; color: #f59e0b; font-weight: 700; }
+  .fd-typical { color: #9ca3af; }
+  .fd-badges { display: flex; gap: 16px; flex-wrap: wrap; }
+  .fd-badge { flex: 1 1 45%; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; background: #fafbfc; display: flex; gap: 12px; align-items: flex-start; }
+  .fd-badge-icon svg { width: 32px; height: 32px; stroke: #0A1F3F; fill: none; stroke-width: 1.8; }
+  .fd-badge-title { font-size: 14px; font-weight: 700; color: #111827; margin: 0 0 4px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-badge-desc { font-size: 12.5px; color: #6b7280; margin: 0; line-height: 1.5; font-family: Inter, Arial, sans-serif; }
+  .fd-right { flex: 1 1 380px; min-width: 280px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 30px; background: #ffffff; }
+  .fd-care-title { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 6px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-care-sub { font-size: 13.5px; color: #6b7280; margin: 0 0 28px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-care-list { list-style: none; padding: 0; margin: 0 0 28px 0; display: flex; flex-direction: column; gap: 22px; }
+  .fd-care-item { display: flex; gap: 16px; align-items: flex-start; }
+  .fd-care-icon { width: 38px; height: 38px; flex-shrink: 0; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .fd-care-icon svg { width: 20px; height: 20px; stroke: #374151; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .fd-care-label { font-size: 14.5px; font-weight: 700; color: #111827; margin: 0 0 4px 0; font-family: Inter, Arial, sans-serif; }
+  .fd-care-text { font-size: 13px; color: #4b5563; margin: 0; line-height: 1.55; font-family: Inter, Arial, sans-serif; }
+  @media (max-width: 700px) { .fd-wrap { padding: 24px 14px; gap: 20px; } .fd-heading { font-size: 22px; } .fd-badge { flex: 1 1 100%; } }
+</style>
 <div class="fd-wrap">
-
-  <!-- LEFT: Why Choose Us -->
   <div class="fd-left">
     <p class="fd-eyebrow">Why Choose Us</p>
     <h2 class="fd-heading">The Difference is in the Details</h2>
-
     <table class="fd-table">
-      <thead>
-        <tr>
-          <th>Feature</th>
-          <th>Our Flag</th>
-          <th>Typical Flag</th>
-        </tr>
-      </thead>
-      <tbody>
-${cmpRows}
-      </tbody>
+      <thead><tr><th>Feature</th><th>Our Flag</th><th>Typical Flag</th></tr></thead>
+      <tbody>${compareRows}</tbody>
     </table>
-
     <div class="fd-badges">
       <div class="fd-badge">
-        <div class="fd-badge-icon">
-          <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M16 3 L20 11 L29 12.5 L22.5 19 L24 28 L16 24 L8 28 L9.5 19 L3 12.5 L12 11 Z"/></svg>
-        </div>
-        <div>
-          <p class="fd-badge-title">Satisfaction Guaranteed</p>
-          <p class="fd-badge-desc">30-day hassle-free returns. If you're not satisfied, we'll make it right.</p>
-        </div>
-      </div>
-          <p class="fd-badge-desc">Full coverage against manufacturing defects on every product we sell.</p>
-        </div>
+        <div class="fd-badge-icon"><svg viewBox="0 0 32 32"><path d="M16 3 L20 11 L29 12.5 L22.5 19 L24 28 L16 24 L8 28 L9.5 19 L3 12.5 L12 11 Z"/></svg></div>
+        <div><p class="fd-badge-title">Satisfaction Guaranteed</p><p class="fd-badge-desc">30-day hassle-free returns. If you're not satisfied, we'll make it right.</p></div>
       </div>
     </div>
   </div>
-
-  <!-- RIGHT: Care & Maintenance -->
   <div class="fd-right">
     <h3 class="fd-care-title">Care &amp; Maintenance</h3>
     <p class="fd-care-sub">Keep your product looking its best</p>
-    <ul class="fd-care-list">
-${careHTML}
-    </ul>
+    <ul class="fd-care-list">${careItems}</ul>
   </div>
-
 </div>
-
-<div style="height:40px"></div>
-
-<div style="height:40px"></div>
 
 <!-- Widget 4a: Stats Bar -->
-<!-- PromoPatriot ${title} - Stats Widget -->
+<style>
+  .fs-stats-wrap { background: #ffffff; padding: 20px; box-sizing: border-box; font-family: Inter, Arial, sans-serif; max-width: 100%; margin: 0 auto; }
+  .fs-stats-wrap * { box-sizing: border-box; }
+  .fs-stats-grid { display: flex; gap: 16px; flex-wrap: wrap; }
+  .fs-stat-card { flex: 1 1 240px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px 24px; display: flex; align-items: flex-start; gap: 16px; background: #ffffff; }
+  .fs-stat-card.fs-gold { border-color: #fde68a; background: #fffbeb; }
+  .fs-stat-card.fs-gold .fs-stat-number { color: #b45309; }
+  .fs-stat-card.fs-gold .fs-stat-label { color: #92400e; }
+  .fs-stat-card.fs-gold .fs-stat-icon { background: #fef3c7; }
+  .fs-stat-card.fs-gold .fs-stat-icon svg { stroke: #b45309; }
+  .fs-stat-icon { width: 42px; height: 42px; flex-shrink: 0; background: #f1f3f7; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .fs-stat-icon svg { width: 22px; height: 22px; stroke: #0A1F3F; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .fs-stat-top { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+  .fs-stat-number { font-size: 28px; font-weight: 800; color: #0A1F3F; line-height: 1; letter-spacing: -0.5px; }
+  .fs-stat-label { font-size: 15px; font-weight: 700; color: #0A1F3F; }
+  .fs-stat-sub { font-size: 12.5px; color: #6b7280; margin: 0; line-height: 1.4; }
+  @media (max-width: 600px) { .fs-stat-card { flex: 1 1 100%; } .fs-stats-wrap { padding: 14px; } }
+</style>
 <div class="fs-stats-wrap">
   <div class="fs-stats-grid">
-
-    <!-- Complete Set -->
     <div class="fs-stat-card fs-gold">
-      <div class="fs-stat-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
-      </div>
-      <div class="fs-stat-content">
-        <div class="fs-stat-top"><span class="fs-stat-number">50K+</span><span class="fs-stat-label">Flags Sold</span></div>
-        <p class="fs-stat-sub">Trusted by homes &amp; businesses nationwide</p>
-      </div>
+      <div class="fs-stat-icon"><svg viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg></div>
+      <div class="fs-stat-content"><div class="fs-stat-top"><span class="fs-stat-number">50K+</span><span class="fs-stat-label">Flags Sold</span></div><p class="fs-stat-sub">Trusted by homes &amp; businesses nationwide</p></div>
     </div>
-
-    <!-- Mini Profile -->
-
-    <!-- 97% Recommend -->
     <div class="fs-stat-card">
-      <div class="fs-stat-icon">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg>
-      </div>
-      <div class="fs-stat-content">
-        <div class="fs-stat-top"><span class="fs-stat-number">97%</span><span class="fs-stat-label">Would Recommend</span></div>
-        <p class="fs-stat-sub">Based on verified customer surveys</p>
-      </div>
+      <div class="fs-stat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+      <div class="fs-stat-content"><div class="fs-stat-top"><span class="fs-stat-number">50K+</span><span class="fs-stat-label">Flags Sold</span></div><p class="fs-stat-sub">To homes &amp; businesses nationwide</p></div>
     </div>
-
+    <div class="fs-stat-card">
+      <div class="fs-stat-icon"><svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></div>
+      <div class="fs-stat-content"><div class="fs-stat-top"><span class="fs-stat-number">30</span><span class="fs-stat-label">Day Returns</span></div><p class="fs-stat-sub">Hassle-free, no questions asked</p></div>
+    </div>
+    <div class="fs-stat-card">
+      <div class="fs-stat-icon"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/></svg></div>
+      <div class="fs-stat-content"><div class="fs-stat-top"><span class="fs-stat-number">97%</span><span class="fs-stat-label">Would Recommend</span></div><p class="fs-stat-sub">Based on verified customer surveys</p></div>
+    </div>
   </div>
 </div>
 
-<div style="height:40px"></div>
-
-<div style="height:40px"></div>
-
 <!-- Widget 4b: FAQ Section -->
-<!-- PromoPatriot ${title} - FAQ Accordion Widget -->
+<style>
+  .faq-wrap { max-width: 100%; margin: 0 auto; padding: 50px 20px; font-family: Inter, Arial, sans-serif; box-sizing: border-box; }
+  .faq-wrap * { box-sizing: border-box; }
+  .faq-heading { text-align: center; font-size: 30px; font-weight: 800; color: #1a2744; margin: 0 0 8px 0; font-family: Inter, Arial, sans-serif; }
+  .faq-subheading { text-align: center; font-size: 14px; color: #6b7280; margin: 0 0 36px 0; font-family: Inter, Arial, sans-serif; }
+  .faq-list { display: flex; flex-direction: column; gap: 12px; }
+  .faq-item { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; background: #ffffff; }
+  .faq-question { width: 100%; background: none; border: none; padding: 20px 22px; text-align: left; font-size: 15px; font-weight: 700; color: #1a2744; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: Inter, Arial, sans-serif; line-height: 1.4; }
+  .faq-question:hover { background: #f9fafb; }
+  .faq-chevron { width: 20px; height: 20px; flex-shrink: 0; stroke: #6b7280; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); stroke: #1a2744; }
+  .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.3s ease; padding: 0 22px; }
+  .faq-item.open .faq-answer { max-height: 400px; padding: 0 22px 20px; }
+  .faq-answer p { margin: 0; font-size: 14px; color: #4b5563; line-height: 1.7; font-family: Inter, Arial, sans-serif; }
+  @media (max-width: 600px) { .faq-heading { font-size: 22px; } .faq-question { font-size: 14px; padding: 16px; } .faq-item.open .faq-answer { padding: 0 16px 16px; } }
+</style>
 <div class="faq-wrap">
   <h2 class="faq-heading">Frequently Asked Questions</h2>
   <p class="faq-subheading">Everything you need to know about the ${title}</p>
-
   <div class="faq-list">
 ${faqItems}
   </div>
@@ -874,20 +907,20 @@ async function pushToWoo(){
     const res=await fetch('/woo-update',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     const d=await res.json();
     if(res.ok){
-      log.innerHTML='<span class="ok">&#10003; Product #'+pid+' updated!</span><br>'+(d.name?'Name: '+d.name+'<br>':'')+(d.permalink?'<a href="'+d.permalink+'" target="_blank" style="color:#065f46">View on store &#8599;</a>':'');
+      log.innerHTML='<span class="ok">OK Product #'+pid+' updated!</span><br>'+(d.name?'Name: '+d.name+'<br>':'')+(d.permalink?'<a href="'+d.permalink+'" target="_blank" style="color:#065f46">View on store -></a>':'');
       setSt('ready','Uploaded');
     }else{
-      log.innerHTML='<span class="err">&#10007; Failed ('+res.status+')</span><br>'+(d.message||JSON.stringify(d));
+      log.innerHTML='<span class="err">FAIL Failed ('+res.status+')</span><br>'+(d.message||JSON.stringify(d));
       setSt('idle','Error');
     }
   }catch(e){
-    log.innerHTML='<span class="err">&#10007; Network error</span><br>'+e.message+'<br><small>Make sure server.py is running</small>';
+    log.innerHTML='<span class="err">FAIL Network error</span><br>'+e.message+'<br><small>Make sure server.py is running</small>';
     setSt('idle','Error');
   }
   document.getElementById('bpush').disabled=false;
 }
 
-// ── Bulk Run ──────────────────────────────────────────────────────────
+//  Bulk Run 
 let bulkRunning = false;
 let bulkStop    = false;
 
@@ -895,13 +928,13 @@ function bulkLog(msg, type){
   const el  = document.getElementById('bulk-log-content');
   const col  = type==='ok'?'#4ade80':type==='err'?'#f87171':type==='skip'?'#94a3b8':'#e2e8f0';
   const time = new Date().toLocaleTimeString();
-  el.innerHTML += `<span style="color:#64748b">[${time}]</span> <span style="color:${col}">${msg}</span>\n`;
+  el.innerHTML += '<span style="color:#64748b">['+time+']</span> <span style="color:'+col+'">'+msg+'</span><br>';
   el.parentElement.scrollTop = el.parentElement.scrollHeight;
 }
 
 function stopBulkRun(){
   bulkStop = true;
-  bulkLog('⏹ Stop requested — finishing current product...','skip');
+  bulkLog('|| Stop requested -- finishing current product...','skip');
   document.getElementById('btn-bulk-stop').style.display='none';
 }
 
@@ -927,7 +960,7 @@ async function startBulkRun(){
   const total = subset.length;
   const startTime = Date.now();
 
-  bulkLog(`▶ Starting bulk run — ${total} products`, 'info');
+  bulkLog('>> Starting bulk run -- ' + total + ' products', 'info');
 
   for(let i=0; i<subset.length; i++){
     if(bulkStop) break;
@@ -950,11 +983,11 @@ async function startBulkRun(){
       document.getElementById('bulk-eta').textContent = `ETA: ${eta}s`;
     }
 
-    bulkLog(`[${i+1}/${total}] ${sku} — ${title}`, 'info');
+    bulkLog(`[${i+1}/${total}] ${sku} -- ${title}`, 'info');
     // Read Product ID directly from Excel
     const pid = (p['Product ID']||p['product_id']||p['WooCommerce ID']||'').toString().trim();
-    if(!pid){bulkLog('  ✗ No Product ID in Excel — skipped','err');failed++;continue;}
-    bulkLog(`  ✓ Product ID: #${pid}`,'ok');
+    if(!pid){bulkLog('  FAIL No Product ID in Excel -- skipped','err');failed++;continue;}
+    bulkLog(`  OK Product ID: #${pid}`,'ok');
     
 
     // 2. Select product to populate menus
@@ -967,7 +1000,7 @@ async function startBulkRun(){
     buildHTML();
     await new Promise(r=>setTimeout(r,100));
 
-    if(!bHTML){bulkLog('  ✗ HTML build failed','err');failed++;continue;}
+    if(!bHTML){bulkLog('  FAIL HTML build failed','err');failed++;continue;}
 
     // 4. Push to WooCommerce
     try{
@@ -995,14 +1028,14 @@ async function startBulkRun(){
       const data = await res.json();
 
       if(res.ok){
-        bulkLog(`  ✓ Pushed successfully — ${data.name||title}`,'ok');
+        bulkLog(`  OK Pushed successfully -- ${data.name||title}`,'ok');
         done++;
       } else {
-        bulkLog(`  ✗ Push failed: ${data.message||res.status}`,'err');
+        bulkLog(`  FAIL Push failed: ${data.message||res.status}`,'err');
         failed++;
       }
     }catch(e){
-      bulkLog('  ✗ Push error: '+e.message,'err');
+      bulkLog('  FAIL Push error: '+e.message,'err');
       failed++;
     }
 
@@ -1022,9 +1055,9 @@ async function startBulkRun(){
   bulkRunning = false;
 
   bulkLog('','info');
-  bulkLog(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,'info');
-  bulkLog(`✓ Done: ${done}   ✗ Failed: ${failed}   — Skipped: ${skipped}`,'ok');
-  bulkLog(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,'info');
+  bulkLog(`--------------------------------`,'info');
+  bulkLog(`OK Done: ${done}   FAIL Failed: ${failed}   -- Skipped: ${skipped}`,'ok');
+  bulkLog(`--------------------------------`,'info');
 }
 
 function setSt(t,tx){const el=document.getElementById('stat');el.className='bdg bdg-'+(t==='ready'?'ready':'idle');el.textContent=tx}
