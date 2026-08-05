@@ -911,6 +911,19 @@ async function pushToWoo(){
     if(res.ok){
       log.innerHTML='<span class="ok">OK Product #'+pid+' updated!</span><br>'+(d.name?'Name: '+d.name+'<br>':'')+(d.permalink?'<a href="'+d.permalink+'" target="_blank" style="color:#065f46">View on store -></a>':'');
       setSt('ready','Uploaded');
+      // Open WP edit page in background and trigger Update
+      const _ef = document.createElement('iframe');
+      _ef.style.cssText='position:fixed;width:1px;height:1px;opacity:0;pointer-events:none';
+      _ef.src='https://onlineflagstore.com/wp-admin/post.php?post='+pid+'&action=edit';
+      _ef.onload=function(){
+        try{
+          const _form=_ef.contentDocument.querySelector('#post');
+          if(_form){_form.submit();log.innerHTML+='<br><span style="color:#6b7280;font-size:11px;">WP Update: done</span>';}
+          else{log.innerHTML+='<br><span style="color:#6b7280;font-size:11px;">WP Update: edit page loaded</span>';}
+        }catch(e){log.innerHTML+='<br><span style="color:#6b7280;font-size:11px;">WP Update: '+e.message+'</span>';}
+        setTimeout(()=>{if(_ef.parentNode)_ef.parentNode.removeChild(_ef);},3000);
+      };
+      document.body.appendChild(_ef);
     }else{
       log.innerHTML='<span class="err">FAIL Failed ('+res.status+')</span><br>'+(d.message||JSON.stringify(d));
       setSt('idle','Error');
