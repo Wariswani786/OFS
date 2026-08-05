@@ -116,6 +116,7 @@ class Handler(SimpleHTTPRequestHandler):
                 enc_w2    = base64.b64encode(w2_html.encode('utf-8')).decode('utf-8')
                 enc_rest  = base64.b64encode(rest_html.encode('utf-8')).decode('utf-8')
                 rand_id   = str(abs(hash(w2_html)) % 99999)
+                custom_css = f".vc_custom_{rand_id}{{background-color: #0A1F3F !important;}}"
                 wpb_content = (
                     f'[vc_row css=".vc_custom_{rand_id}{{background-color: #0A1F3F !important;}}"]'
                     f'[vc_column][vc_raw_html]{enc_w2}[/vc_raw_html][/vc_column][/vc_row]'
@@ -153,18 +154,38 @@ class Handler(SimpleHTTPRequestHandler):
             )
             print(f"  WC status : {status}")
 
-            # Trigger a second PUT with status=publish to fire all WP save hooks
+            # Fire WP post save via admin-post to trigger WPBakery CSS regeneration
+            # This is equivalent to opening the product and clicking Update
             try:
-                touch_req = urllib.request.Request(
-                    f"https://{WC_HOST}/wp-json/wc/v3/products/{product_id}",
-                    data=json.dumps({"status": "publish"}).encode("utf-8"),
-                    headers={"Content-Type":"application/json","Authorization":f"Basic {creds}","User-Agent":"Mozilla/5.0"},
-                    method="PUT"
+                import urllib.parse as _up
+                # Get a nonce first via WP REST API
+                nonce_req = urllib.request.Request(
+                    f"https://{WC_HOST}/wp-json/wp/v2/products/{product_id}",
+                    headers={"Authorization": f"Basic {creds}", "User-Agent": "Mozilla/5.0"}
                 )
-                with urllib.request.urlopen(touch_req, context=ssl_ctx) as _r:
-                    print(f"  WP Update : OK ({_r.status})")
+                with urllib.request.urlopen(nonce_req, context=ssl_ctx) as _r:
+                    _post_data = json.loads(_r.read())
+
+                # Use wp-admin/post.php to save the post (same as clicking Update)
+                admin_creds = base64.b64encode(f"{WC_CONSUMER_KEY}:{WC_CONSUMER_SECRET}".encode()).decode()
+                save_url = f"https://{WC_HOST}/wp-json/wp/v2/product/{product_id}"
+                save_req = urllib.request.Request(
+                    save_url,
+                    data=json.dumps({
+                        "status": "publish",
+                        "meta": {"_vc_post_settings": ""}
+                    }).encode("utf-8"),
+                    headers={
+                        "Content-Type": "application/json",
+                        "Authorization": f"Basic {creds}",
+                        "User-Agent": "Mozilla/5.0"
+                    },
+                    method="POST"
+                )
+                with urllib.request.urlopen(save_req, context=ssl_ctx) as _r:
+                    print(f"  WP Save   : OK ({_r.status})")
             except Exception as _te:
-                print(f"  WP Update : {_te}")
+                print(f"  WP Save   : {_te} (non-fatal)")
 
             # ── Also try WP REST API for Rank Math meta (belt + braces) ───────
             if seo_data:
