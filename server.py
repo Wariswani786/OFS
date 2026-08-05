@@ -24,6 +24,8 @@ WC_CONSUMER_KEY    = os.environ.get("WC_CONSUMER_KEY", "")
 WC_CONSUMER_SECRET = os.environ.get("WC_CONSUMER_SECRET", "")
 PRIORITY_USER      = os.environ.get("PRIORITY_USER", "API")
 PRIORITY_PASS      = os.environ.get("PRIORITY_PASS", "Aa12345")
+WP_ADMIN_USER      = os.environ.get("WP_ADMIN_USER", "")
+WP_ADMIN_PASS      = os.environ.get("WP_ADMIN_PASS", "")
 PORT               = int(os.environ.get("PORT", 8000))
 
 ssl_ctx = ssl.create_default_context()
@@ -115,12 +117,13 @@ class Handler(SimpleHTTPRequestHandler):
                 rest_html = w2_match.group(2).strip()
                 enc_w2    = base64.b64encode(w2_html.encode('utf-8')).decode('utf-8')
                 enc_rest  = base64.b64encode(rest_html.encode('utf-8')).decode('utf-8')
-                # Widget 2 uses inline style on div — no need for vc_row CSS attribute
+                rand_id   = str(abs(hash(w2_html)) % 99999)
                 wpb_content = (
-                    f'[vc_row][vc_column][vc_raw_html]{enc_w2}[/vc_raw_html][/vc_column][/vc_row]'
+                    f'[vc_row css=".vc_custom_{rand_id}{{background-color: #0A1F3F !important;}}"]'
+                    f'[vc_column][vc_raw_html]{enc_w2}[/vc_raw_html][/vc_column][/vc_row]'
                     f'[vc_row][vc_column][vc_raw_html]{enc_rest}[/vc_raw_html][/vc_column][/vc_row]'
                 )
-                print(f"  WPBakery  : 2 rows (W2 bg via inline style)")
+                print(f"  WPBakery  : W2 dark row + content row")
             else:
                 enc = base64.b64encode(description.encode('utf-8')).decode('utf-8')
                 wpb_content = f'[vc_row][vc_column][vc_raw_html]{enc}[/vc_raw_html][/vc_column][/vc_row]'
@@ -151,6 +154,51 @@ class Handler(SimpleHTTPRequestHandler):
                 send_data, "PUT", creds
             )
             print(f"  WC status : {status}")
+
+            # Simulate clicking Update in WP admin to trigger WPBakery CSS regeneration
+            try:
+                import urllib.parse as _up, re as _re, http.cookiejar as _cj
+                # Login to WP admin
+                _cjar = _cj.CookieJar()
+                _opener = urllib.request.build_opener(
+                    urllib.request.HTTPCookieProcessor(_cjar),
+                    urllib.request.HTTPSHandler(context=ssl_ctx)
+                )
+                _login = _opener.open(
+                    urllib.request.Request(
+                        f"https://{WC_HOST}/wp-login.php",
+                        data=_up.urlencode({"log": WP_ADMIN_USER or PRIORITY_USER, "pwd": WP_ADMIN_PASS or PRIORITY_PASS,
+                            "wp-submit": "Log In", "testcookie": "1",
+                            "redirect_to": "/wp-admin/"}).encode(),
+                        headers={"Content-Type": "application/x-www-form-urlencoded",
+                                 "User-Agent": "Mozilla/5.0",
+                                 "Cookie": "wordpress_test_cookie=WP+Cookie+check"},
+                        method="POST"
+                    )
+                )
+                print(f"  WP Login  : {_login.status}")
+                # Get edit page for nonce
+                _edit = _opener.open(f"https://{WC_HOST}/wp-admin/post.php?post={product_id}&action=edit")
+                _ehtml = _edit.read().decode("utf-8", errors="ignore")
+                _nm = _re.search(r'name="_wpnonce" value="([^"]+)"', _ehtml)
+                _nonce = _nm.group(1) if _nm else ""
+                print(f"  WP Nonce  : {'found' if _nonce else 'not found'}")
+                if _nonce:
+                    _save = _opener.open(
+                        urllib.request.Request(
+                            f"https://{WC_HOST}/wp-admin/post.php",
+                            data=_up.urlencode({"post_ID": product_id, "action": "editpost",
+                                "post_status": "publish", "post_type": "product",
+                                "_wpnonce": _nonce, "save": "Update"}).encode(),
+                            headers={"Content-Type": "application/x-www-form-urlencoded",
+                                     "User-Agent": "Mozilla/5.0",
+                                     "Referer": f"https://{WC_HOST}/wp-admin/post.php?post={product_id}&action=edit"},
+                            method="POST"
+                        )
+                    )
+                    print(f"  WP Update : clicked ({_save.status})")
+            except Exception as _we:
+                print(f"  WP Update : {_we} (non-fatal)")
 
 
 
