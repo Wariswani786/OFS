@@ -545,8 +545,8 @@ function buildHTML(){
 
   // Checklist -- all B columns, bold chkLabel + desc
   const chkl=ft.map(f=>`      <li class="pdesc-check-item">
-        <span class="pdesc-check-mark">OK</span>
-        <span class="pdesc-check-text"><strong>${f.chkLabel}</strong> \u2014 ${f.desc}</span>
+        <span class="pdesc-check-mark">✓</span>
+        <span class="pdesc-check-text"><strong>${f.chkLabel}</strong> &mdash; ${f.desc}</span>
       </li>`).join('\n');
 
   // Spec rows
